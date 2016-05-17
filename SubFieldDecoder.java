@@ -27,7 +27,7 @@ public class SubFieldDecoder {
             case "x81":
                 decode_data_xAC_x30 = DataConverter.Int2HexString(raw_data_xAC_x30_sub1);
                 return decode_data_xAC_x30;
-//--------------------------------- End x81 ---------------------------------                
+//--------------------------------- End x81 ---------------------------------
 
 //--------------------------------- Start x82 ---------------------------------
             case "x82":
@@ -45,7 +45,7 @@ public class SubFieldDecoder {
             case "x84":
                 decode_data_xAC_x30 = "dataVolumeDownlink:" + Integer.toString(DataConverter.hexString2int(DataConverter.Int2HexString(raw_data_xAC_x30_sub1)));
                 return decode_data_xAC_x30;
-//--------------------------------- End x84 ---------------------------------                
+//--------------------------------- End x84 ---------------------------------
 
 //--------------------------------- Start x85 (changeCondition) ---------------------------------
             case "x85":
@@ -63,7 +63,7 @@ public class SubFieldDecoder {
             case "x87":
                 decode_data_xAC_x30 = DataConverter.Int2HexString(raw_data_xAC_x30_sub1);
                 return decode_data_xAC_x30;
-//--------------------------------- End x87 ---------------------------------                
+//--------------------------------- End x87 ---------------------------------
 
 //--------------------------------- Start x88 ---------------------------------
             case "x88":
@@ -106,7 +106,7 @@ public class SubFieldDecoder {
     private String decode_xAC_x30_xA9(String tag_string, int[] raw_tag_data) {
 
         String decode_data;
-       
+
         switch (tag_string) {
             case "x81":
                 decode_data = "qCI:" + Integer.toString(DataConverter.hexString2int(DataConverter.Int2HexString(raw_tag_data)));
