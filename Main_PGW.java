@@ -1,0 +1,194 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package pgw;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+//import java.lang.reflect.Method;
+
+/**
+ *
+ * @author Samreng 2016-05-02 22:10
+ */
+public class Main_PGW {
+
+    static int file_indx = 0, record_byte = 0, fieldLength = 0;
+    static String record_type, field_hex_str = "", tag_1hex_str, tag_2hex_str, tag_3hex_str;
+    static String tag_list = "x80,1,RecordType,Integer|x83,1,servedIMSI,TBCD2String|xA4,1,PGWAddress,Choice|x85,1,chargingID,Byte2Integer|"
+            + "xA6,1,servingNodeAddress,Choice|x87,1,APN,IA5String|x88,1,pdpPDNType,OctetString|xA9,1,servedPDPPDNAddress,Choice|"
+            + "x8B,1|xAC,1|x8D,1|x8E,1|x8F,1|x91,1|x92,1|x94,1|x95,1|x96,1|x97,1|x98,1|x9B,1|x9D,1|x9E,1|"
+            + "x9F1F,1,xxx,yyy|x9F20,1,xxx,yyy||xBF23,1,xxx,yyy||x9F25,1,xxx,yyy||x9F26,1,xxx,yyy|"
+            + "x9F1F22,1,xxx,yyy";
+
+    public static void main(String[] args) throws FileNotFoundException, IOException {
+        int record_indx = 0;
+
+        RawFile readFile = new RawFile(); // Create Object from class readRaw
+        int[] rawFileInt = readFile.readBinaryFile    // ("C:\\Users\\Samreng\\Documents\\HSPA\\CDR Project\\CDR_Description PS_R8\\raw_PS_R8\\PGW\\006295981_20160428091436.cdr");
+                //    ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\0000204700_20140403221949.cdr");
+                    ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample.cdr");
+//                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample2.cdr");
+//                ("C:\\Users\\Samreng\\Documents\\HSPA\\CDR Project\\CDR_Description PS_R8\\pscdr2text\\0000211585_20140920201238.cdr");
+//        ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\b00000001.dat");
+        int fileLength = rawFileInt.length;
+        System.out.println("File length = " + fileLength + "|0x" + String.format("%02X", fileLength) + " Byte"); // Debug
+
+        FieldDecoder decode = new FieldDecoder();       // Create Object from class FieldDecoder
+        RawFile getRaw = new RawFile();                 // Create Object from class RawFile
+        DataConverter data_conv = new DataConverter();  // Create Object from class DataConverter
+
+//---------------- Start of loop record process ------------------------        
+        String record_type_hex_str = String.format("%02X", rawFileInt[file_indx]) + String.format("%02X", rawFileInt[file_indx + 1]);
+        if ("BF4F".equals(record_type_hex_str)) {
+            file_indx = file_indx + 2;
+            System.out.println("Addr:" + file_indx + " is PGW Record"); // Debug Print out
+            int record_len_byte = rawFileInt[file_indx] - 0x80; //Check number of Byte is define Record length (1 or 2 Byte)
+            file_indx++;
+            for (int i = 0; i < record_len_byte; i++) {
+                field_hex_str = field_hex_str + String.format("%02X", rawFileInt[file_indx]);
+                file_indx++;
+            }
+            field_hex_str = "0x" + field_hex_str; // Add prefix Hex String format (0x)
+            int record_length = data_conv.hexString2int(field_hex_str); // Calculate Record length ( xxx Byte)
+//            System.out.println("Rec len Str:"+field_hex_str);         // Debug print
+            System.out.println("Record length:" + record_length + " Byte");    // Debug print
+//            System.out.println("Raw File @file_indx:"+rawFileInt[file_indx]);   // Debug print
+
+            String record_decode_data = ""; // Recodr data buffer
+//            String field_decode_data = ""; // Recodr data buffer
+            do {
+
+//---------- Start of Check Tag field length 1,2,3Byte ---------------------
+                tag_1hex_str = "x" + String.format("%02X", rawFileInt[file_indx]);    // Convert Integer to Hex String for check Tag field 1Byte
+
+//----------------------------- Start of tag_1hex_str ---------------------------
+                System.out.println("------------------- Start of field --------------------");
+                if (tag_list.contains(tag_1hex_str + ",")) {     // Check 1Byte Tag field is in Tag list table
+
+                    System.out.print("Field Tag: " + tag_1hex_str + "   Address: 0x" + String.format("%02X", file_indx) + "  "); // Debug print
+                    file_indx++;
+                    record_indx++;
+                    int tag_list_length = tag_list.indexOf("|", tag_list.indexOf(tag_1hex_str));
+                    String field_conf = tag_list.substring(tag_list.indexOf(tag_1hex_str), tag_list_length);
+                    String field_skip = field_conf.substring(field_conf.indexOf(",") + 1, field_conf.indexOf(",") + 2);
+                    int field_length = rawFileInt[file_indx];
+                    if ("1".equals(field_skip)) {
+//                        System.out.println("File Index(StartValue):" + String.format("%02X", file_indx + 1)); // Debug print
+
+                        int[] field_raw_int = new int[field_length]; // Array for field raw data interger
+                        file_indx++;
+                        record_indx++;
+                        for (int i = 0; i < field_length; i++) {
+                            field_raw_int[i] = rawFileInt[file_indx];
+                            file_indx++;
+                            record_indx++;
+                        }
+                        String field_decode_data = decode.decoder(tag_1hex_str, field_raw_int, field_conf);
+                        record_decode_data = record_decode_data + "|" + field_decode_data;
+
+                        System.out.println("length: " + field_length + "|0x" + String.format("%02X", field_length) + " Byte");    // Debug print
+                        System.out.println("Field Decode Data:" + field_decode_data);     // Debug print
+//                        System.out.println("File Index:"+String.format("%02X", file_indx)); // Debug print
+
+                    } else {
+                        file_indx = file_indx + field_length;   // Skip file index to next field
+                    }
+//                    System.out.println("Tag end:" + tag_list_length);   // Debug print
+                    System.out.println("Field config: " + tag_list.substring(tag_list.indexOf(tag_1hex_str), tag_list_length));   // Debug print
+//----------------------------- End of tag_1hex_str ---------------------------
+
+//----------------------------- Start of tag_2hex_str ---------------------------
+                } else {
+                    tag_2hex_str = tag_1hex_str.substring(0, 3) + String.format("%02X", rawFileInt[file_indx + 1]);    // Convert Integer to Hex String for check Tag field 2Byte
+//                    System.out.println("tag_2hex_str:" + tag_2hex_str);   //Debug
+                    if (tag_list.contains(tag_2hex_str + ",")) {     // Check 2Byte Tag field is in Tag list table
+                        System.out.print("Field Tag: " + tag_2hex_str + "   Address: 0x" + String.format("%02X", file_indx) + "  "); // Debug print
+                        file_indx += 2;
+                        record_indx += 2;
+//                        System.out.println("File Index2Hex:" + String.format("%02X", file_indx)); // Debug print
+
+                        int tag_list_length = tag_list.indexOf("|", tag_list.indexOf(tag_2hex_str));
+                        String field_conf = tag_list.substring(tag_list.indexOf(tag_2hex_str), tag_list_length);
+                        String field_skip = field_conf.substring(field_conf.indexOf(",") + 1, field_conf.indexOf(",") + 2);
+
+//                        System.out.println("Field Skip:" + field_skip); // Debug
+                        int field_length = rawFileInt[file_indx];
+                        if ("1".equals(field_skip)) {
+                            int[] field_raw_int = new int[field_length]; // Array for field raw data interger
+                            file_indx++;
+                            record_indx++;
+                            for (int i = 0; i < field_length; i++) {
+                                field_raw_int[i] = rawFileInt[file_indx];
+                                file_indx++;
+                                record_indx++;
+                            }
+                            String field_decode_data = decode.decoder(tag_2hex_str, field_raw_int, field_conf);
+                            record_decode_data = record_decode_data + "|" + field_decode_data;
+
+                            System.out.println("  length:" + field_length + "|0x" + String.format("%02X", field_length) + " Byte");    // Debug print
+                            System.out.println("Field Decode Data:" + field_decode_data);     // Debug print
+//                        System.out.println("File Index:"+String.format("%02X", file_indx)); // Debug print
+
+                        } else {
+                            file_indx = file_indx + field_length;   // Skip file index to next field
+                        }
+                        System.out.println("Field config: " + tag_list.substring(tag_list.indexOf(tag_2hex_str), tag_list_length));   // Debug print
+//----------------------------- End of tag_2hex_str ---------------------------
+
+//----------------------------- Start of tag_3hex_str ---------------------------
+                    } else {
+                        tag_3hex_str = tag_2hex_str.substring(0, 5) + String.format("%02X", rawFileInt[file_indx + 2]);    // Convert Integer to Hex String for check Tag field 2Byte
+                        System.out.println("tag_3hex_str:" + tag_3hex_str + ",");   //Debug
+                        if (tag_list.contains(tag_3hex_str)) {     // Check 3Byte Tag field is in Tag list table
+                            System.out.print("Field Tag: " + tag_3hex_str + "   Address: 0x" + String.format("%02X", file_indx) + "  "); // Debug print
+                            file_indx += 3;
+                            record_indx += 3;
+//                        System.out.println("File Index3Hex:" + String.format("%02X", file_indx)); // Debug print
+
+                            int tag_list_length = tag_list.indexOf("|", tag_list.indexOf(tag_3hex_str));
+                            String field_conf = tag_list.substring(tag_list.indexOf(tag_3hex_str), tag_list_length);
+                            String field_skip = field_conf.substring(field_conf.indexOf(",") + 1, field_conf.indexOf(",") + 2);
+
+//                        System.out.println("Field Skip:" + field_skip); // Debug
+                            int field_length = rawFileInt[file_indx];
+                            if ("1".equals(field_skip)) {
+//                            System.out.println("File Index(StartValue):" + String.format("%02X", file_indx + 1)); // Debug print
+                                int[] field_raw_int = new int[field_length]; // Array for field raw data interger
+                                file_indx++;
+                                record_indx++;
+                                for (int i = 0; i < field_length; i++) {
+                                    field_raw_int[i] = rawFileInt[file_indx];
+                                    file_indx++;
+                                    record_indx++;
+                                }
+                                String field_decode_data = decode.decoder(tag_3hex_str, field_raw_int, field_conf);
+                                record_decode_data = record_decode_data + "|" + field_decode_data;
+
+                                System.out.println("  length:" + field_length + "|0x" + String.format("%02X", field_length) + " Byte");    // Debug print
+                                System.out.println("Field Decode Data:" + field_decode_data);     // Debug print
+//                        System.out.println("File Index:"+String.format("%02X", file_indx)); // Debug print
+
+                            } else {
+                                file_indx = file_indx + field_length;   // Skip file index to next field
+                            }
+//----------------------------- Debug ---------------------------
+//                        System.out.println("Tag end:" + tag_list_length);   // Debug print
+                            System.out.println("Field config: " + tag_list.substring(tag_list.indexOf(tag_3hex_str), tag_list_length));   // Debug print
+//----------------------------- End of tag_3hex_str ---------------------------
+
+                        } else {
+                            System.out.println("Unknow Tag!!! File address: " + "0x" + String.format("%02X", file_indx));
+                            System.out.println("Raw data remaining in process: " + (record_length - record_indx) + " Byte");
+                            break;
+                        }
+                    }
+                }
+            } while (record_indx < record_length);
+        } else {
+            System.out.println("Not PGW-Record");
+        }
+    }
+}
