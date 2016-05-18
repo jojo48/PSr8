@@ -155,34 +155,49 @@ public class FieldDecoder {
 
 //---------------------- Start of case xAC (listOfTrafficVolumes) ----------------------
             case "xAC":
-               
-//                int field_length=field_raw_data.length;
-//                int remain_raw_xAC = field_length;
-//                int sub_field_indx=0;
-//                String sub_field30_decode_data="";
-//                if(field_raw_data[0]==0x30){
-//                    
-//                   int sub_field30_offset;  // use for set loop for process each sub_field
-//                   
-//                   int sub_field30_length=field_raw_data[1];
-//                    
-//                    int[] sub_field30=new int[sub_field30_length];
-//                    for (int i=0;i<sub_field30_length;i++){
-//                        sub_field30[i]=field_raw_data[i+sub_field_indx];
-//                    }
-//                    sub_field30_decode_data=sub_field_xAC_30(sub_field30);
-//                    
-//                    
-//                    
-//                    remain_raw_xAC=remain_raw_xAC-sub_field30_length;
-//                }else{
-//                    field_decode_data="Unknow SubTAG:"+DataConverter.Int2HexString(field_raw_data);
-//                }
                 
-                
-                field_decode_data=DataConverter.Int2HexString(field_raw_data);
-                return field_decode_data;
-                
+//                field_decode_data=DataConverter.Int2HexString(field_raw_data);
+//                return field_decode_data;
+      
+                 String xAC_30_decode_data;
+        String decode_data_xAC_30_sub1="";
+        int xAC_indx = 0;
+        int xAC_len = field_raw_data.length;  // may be not use
+        String xAC_30_tag_list = "x81,x82,x83,x84,x85,x86,x87,x88,xA9";
+
+
+        int xAC_x30_indx = 0;
+         do {
+             
+        if (field_raw_data[xAC_x30_indx] == 0x30) {  // Check sub_tag level 1 (x30)
+            xAC_indx++;
+            xAC_x30_indx++;
+            int xAC_x30_len = field_raw_data[xAC_x30_indx];  // may be not use
+            xAC_indx++;
+            xAC_x30_indx++;
+
+            do {
+                int raw_xAC_30_sub1_len = field_raw_data[xAC_x30_indx + 1];
+                int[] sub_raw_xAC_30 = new int[raw_xAC_30_sub1_len + 2];
+
+                for (int i = 0; i < (raw_xAC_30_sub1_len + 2); i++) {   //Tag+Length+Data (0x83, 0x02, 0x2E, 0x0A)
+                    sub_raw_xAC_30[i] = field_raw_data[xAC_x30_indx];
+                    xAC_indx++;
+                    xAC_x30_indx++;
+                }
+                System.out.println("Dump array sub xAC30:" + DataConverter.Int2HexString(sub_raw_xAC_30));    //Debug
+                decode_data_xAC_30_sub1 =decode_data_xAC_30_sub1+","+ SubFieldDecoder.decode_xAC_x30(sub_raw_xAC_30);
+                System.out.println("decode_xAC_30_sub1:" + decode_data_xAC_30_sub1); // Debug
+//            }
+           
+            
+        }  while (xAC_x30_indx < xAC_x30_len);
+        } else{  // Unknow SubTag
+              }
+        decode_data_xAC_30_sub1=decode_data_xAC_30_sub1.substring(1,decode_data_xAC_30_sub1.length());  //trim first comma (,)
+        decode_data_xAC_30_sub1="["+decode_data_xAC_30_sub1+"]";
+        
+    }while(xAC_indx <xAC_len);
 
 //---------------------- End of case xAC ----------------------
 
