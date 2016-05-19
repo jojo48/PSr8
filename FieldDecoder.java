@@ -12,6 +12,7 @@ package pgw;
 public class FieldDecoder {
 
     DataConverter DataConverter = new DataConverter();  //Create Object DataConverter
+    SubFieldDecoder SubFieldDecoder = new SubFieldDecoder();    //Create Object SubFieldDecoder
 
     public String decoder(String tag_hex_str, int[] field_raw_data, String field_conf) {
         String field_decode_data;
@@ -155,49 +156,64 @@ public class FieldDecoder {
 
 //---------------------- Start of case xAC (listOfTrafficVolumes) ----------------------
             case "xAC":
-                
+
 //                field_decode_data=DataConverter.Int2HexString(field_raw_data);
 //                return field_decode_data;
-      
-                 String xAC_30_decode_data;
-        String decode_data_xAC_30_sub1="";
-        int xAC_indx = 0;
-        int xAC_len = field_raw_data.length;  // may be not use
-        String xAC_30_tag_list = "x81,x82,x83,x84,x85,x86,x87,x88,xA9";
+                
+                if(field_raw_data[0]==0x30){    //Check is SubTag 0x30
+                    
+                
+//                DataConverter DataConverter = new DataConverter();
+                SubFieldDecoder SubFieldDecoder1 = new SubFieldDecoder();
+                field_decode_data = "";
 
+ 
+//                String xAC_30_decode_data;
+                String decode_data_xAC_x30="";
+//                int field_raw_data_indx = 0;
+                int xAC_indx = 0;
+                int xAC_len = field_raw_data.length;  // may be not use
+//                String xAC_30_tag_list = "x81,x82,x83,x84,x85,x86,x87,x88,xA9";
+                int xAC_sub_len;
 
-        int xAC_x30_indx = 0;
-         do {
-             
-        if (field_raw_data[xAC_x30_indx] == 0x30) {  // Check sub_tag level 1 (x30)
-            xAC_indx++;
-            xAC_x30_indx++;
-            int xAC_x30_len = field_raw_data[xAC_x30_indx];  // may be not use
-            xAC_indx++;
-            xAC_x30_indx++;
+                do {
+                    int xAC30_sub_len = field_raw_data[xAC_indx + 1];  //  +2 for TagHeader & Length
+                    int[] raw_xAC_x30 = new int[xAC30_sub_len];
+                    for (int i = 0; i < xAC30_sub_len; i++) {
+                        raw_xAC_x30[i] = field_raw_data[xAC_indx+2];
+                        xAC_indx++;
+                    }
+                     xAC_indx+=2;    // Skip TagHeader+length (2Byte)
+                     int decode_indx=0;
+                     String sub1_decode_data="";
+                     do{
+                         int sub1_len=raw_xAC_x30[decode_indx+1];
+                         int[] sub1_raw=new int[sub1_len];
+                         for(int i=0;i<sub1_len;i++){
+                             sub1_raw[i]=raw_xAC_x30[decode_indx];
+                             decode_indx++;
+                         }
+                         sub1_decode_data=sub1_decode_data+","+SubFieldDecoder1.decode_xAC_x30(sub1_raw);
+                     }while(xAC30_sub_len<decode_indx);
+                     
+                     
+                    //xAC_indx--;
+//                    decode_data_xAC_x30 = SubFieldDecoder1.decode_xAC_x30(raw_xAC_x30);
+//                    decode_data_xAC_x30 = decode_data_xAC_x30.substring(1, decode_data_xAC_x30.length());  //trim first comma (,)
+//                    decode_data_xAC_x30 = "[" + decode_data_xAC_x30 + "]";
+//                    field_decode_data = field_decode_data + decode_data_xAC_x30;
+                    
+                    field_decode_data=field_decode_data+DataConverter.Int2HexString(raw_xAC_x30)+" xAC_indx:"+xAC_indx+" xAC_len:"+xAC_len;
+                    
 
-            do {
-                int raw_xAC_30_sub1_len = field_raw_data[xAC_x30_indx + 1];
-                int[] sub_raw_xAC_30 = new int[raw_xAC_30_sub1_len + 2];
-
-                for (int i = 0; i < (raw_xAC_30_sub1_len + 2); i++) {   //Tag+Length+Data (0x83, 0x02, 0x2E, 0x0A)
-                    sub_raw_xAC_30[i] = field_raw_data[xAC_x30_indx];
-                    xAC_indx++;
-                    xAC_x30_indx++;
+                } while (xAC_indx < xAC_len);
+                
+                
+                }else{
+                    field_decode_data="Unknow Tag";
                 }
-                System.out.println("Dump array sub xAC30:" + DataConverter.Int2HexString(sub_raw_xAC_30));    //Debug
-                decode_data_xAC_30_sub1 =decode_data_xAC_30_sub1+","+ SubFieldDecoder.decode_xAC_x30(sub_raw_xAC_30);
-                System.out.println("decode_xAC_30_sub1:" + decode_data_xAC_30_sub1); // Debug
-//            }
-           
-            
-        }  while (xAC_x30_indx < xAC_x30_len);
-        } else{  // Unknow SubTag
-              }
-        decode_data_xAC_30_sub1=decode_data_xAC_30_sub1.substring(1,decode_data_xAC_30_sub1.length());  //trim first comma (,)
-        decode_data_xAC_30_sub1="["+decode_data_xAC_30_sub1+"]";
-        
-    }while(xAC_indx <xAC_len);
+                
+                return field_decode_data;
 
 //---------------------- End of case xAC ----------------------
 
