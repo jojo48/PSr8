@@ -78,7 +78,7 @@ class SubFieldDecoder {
 
 //--------------------------------- Start x86 (changeTime) ---------------------------------
             case "x86":
-                decode_data_xAC_x30_sub = "changeTime:" + DataConverter.Int2Datetime(raw_xAC_x30_sub1);
+                decode_data_xAC_x30_sub = "changeTime:" + DataConverter.Int2DateTime(raw_xAC_x30_sub1);
                 return decode_data_xAC_x30_sub;
 //--------------------------------- End x86 ---------------------------------//--------------------------------- End x86 ---------------------------------
 

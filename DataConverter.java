@@ -32,11 +32,15 @@ public class DataConverter {
         String tBCDstring = "";
         for (int i = 0; i < rawInt2String.length; i++) {
             String rawByteHexString = String.format("%02X", rawInt2String[i]);
-            if (!"F".equals(rawByteHexString.substring(0, 1))) {
-                tBCDstring = tBCDstring + rawByteHexString.substring(1, 2);
-                tBCDstring = tBCDstring + rawByteHexString.substring(0, 1);
+
+            if (!"FF".equals(rawByteHexString)) {
+                if (!"F".equals(rawByteHexString.substring(0, 1))) {
+                    tBCDstring = tBCDstring + rawByteHexString.substring(1, 2);
+                    tBCDstring = tBCDstring + rawByteHexString.substring(0, 1);
+                } else {
+                    tBCDstring = tBCDstring + rawByteHexString.substring(1, 2);
+                }
             } else {
-                tBCDstring = tBCDstring + rawByteHexString.substring(1, 2);
             }
         }
         return tBCDstring;
@@ -89,7 +93,7 @@ public class DataConverter {
         return string_decode;
     }
 
-    public String Int2Datetime(int[] rawInt2Datetime) {
+    public String Int2DateTime(int[] rawInt2Datetime) {
         String Datetime_decode;
         if (rawInt2Datetime.length == 9) {
             Datetime_decode = "20" + String.format("%02X", rawInt2Datetime[0]) + "-" + String.format("%02X", rawInt2Datetime[1]) + "-" + String.format("%02X", rawInt2Datetime[2]) // Date
