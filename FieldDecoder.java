@@ -164,6 +164,9 @@ public class FieldDecoder {
                     int xAC_len = field_raw_data.length;
                     int xAC_sub_len;
 
+                    String[] str_decode = new String[3];  //Debug
+                    int arr_indx = 0;                     //Debug
+
                     do {
                         int xAC30_sub_len = field_raw_data[xAC_indx + 1];  //  +2 for TagHeader & Length
                         int[] raw_xAC_x30 = new int[xAC30_sub_len];
@@ -172,12 +175,14 @@ public class FieldDecoder {
                             xAC_indx++;
                         }
                         xAC_indx += 2;    // Skip TagHeader+length (2Byte)
+
                         decode_data_xAC_x30 = SubFieldDecoder1.decode_xAC_x30(raw_xAC_x30);
                         field_decode_data = field_decode_data + "," + decode_data_xAC_x30;
                     } while (xAC_indx < xAC_len);
                 } else {
                     field_decode_data = "Unknow Tag";
                 }
+
                 field_decode_data = field_decode_data.substring(1, field_decode_data.length());  //trim first comma (,)
                 field_decode_data = "{" + field_decode_data + "}";
                 return field_decode_data;
@@ -236,39 +241,10 @@ public class FieldDecoder {
 
 //---------------------- Start of case x9F 20 (userLocationInformation) ----------------------
             case "x9F20":
-                int[] plmn_raw = new int[3];
-                for (int i = 0; i < 3; i++) {
-                    plmn_raw[i] = field_raw_data[i + 1];
-                }
-                String lac_hex_str = "0x" + String.format("%02X", field_raw_data[4]) + String.format("%02X", field_raw_data[5]);
-                String ci_hex_str = "0x" + String.format("%02X", field_raw_data[6]) + String.format("%02X", field_raw_data[7]);
-
-                if (field_raw_data.length == 8) {
-                    if (field_raw_data[0] == 0) {    // 0=CGI =>(PLMN+LAC+CI) ; 1=SAI =>(PLMN+LAC+SAC)
-                        field_decode_data = "PLMN:" + DataConverter.tBCD2String(plmn_raw) + " LAC:" + Integer.toString(DataConverter.hexString2int(lac_hex_str))
-                                + " CI:" + Integer.toString(DataConverter.hexString2int(ci_hex_str));
-                    } else {
-                        field_decode_data = "PLMN:" + DataConverter.tBCD2String(plmn_raw) + " LAC:" + Integer.toString(DataConverter.hexString2int(lac_hex_str))
-                                + " SAC:" + Integer.toString(DataConverter.hexString2int(ci_hex_str));
-                    }
-                } else {
-                    if (field_raw_data.length == 0x0D) {
-                        String tai_hex_str = "0x" + String.format("%02X", field_raw_data[4]) + String.format("%02X", field_raw_data[5]);
-                        String ecgi_hex_str = "0x" + String.format("%02X", field_raw_data[9]) + String.format("%02X", field_raw_data[10])
-                                + String.format("%02X", field_raw_data[11]) + String.format("%02X", field_raw_data[12]);
-                        if (field_raw_data[0] == 0x18) {    // 0x18 = 4G (TAI,ECGI)
-                            field_decode_data = "PLMN:" + DataConverter.tBCD2String(plmn_raw) + " TAI:" + Integer.toString(DataConverter.hexString2int(tai_hex_str))
-                                    + " ECGI:" + Integer.toString(DataConverter.hexString2int(ecgi_hex_str));
-                        } else {
-                            field_decode_data = "Unknow TAG:" + DataConverter.Int2HexString(field_raw_data);
-                        }
-                    } else {
-                        field_decode_data = "Unknow TAG:" + DataConverter.Int2HexString(field_raw_data);
-                    }
-                }
+                field_decode_data = SubFieldDecoder.userLocInfo(field_raw_data);
                 return field_decode_data;
-//---------------------- End of case x9F 20 ----------------------
-
+//---------------------- End of case x9F 20 ---------------------- 
+                
 //---------------------- Start of case xBF 23 (servingNodeType) ----------------------
             case "xBF23":
                 field_decode_data = Integer.toString(field_raw_data[(field_raw_data.length - 1)]);
