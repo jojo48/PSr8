@@ -221,9 +221,11 @@ System.out.println("fileLength:" + "0x" + String.format("%02X", fileLength) + " 
                     }
                 }
                 
-            } while (record_indx < record_length);
+            }
+            while (record_indx < record_length);    
+//            while (fileIndex < record_length);
         } else {
-            System.out.println("Not PGW-Record");
+            System.out.println("fileIndex:0x"+String.format("%02X",fileIndex)+" record_indx:0x"+String.format("%02X",record_indx)+" Not PGW-Record");
         }
         recordNo++;
     }while(fileIndex < fileLength);
