@@ -30,14 +30,15 @@ public class Main_PGW {
 
         int record_indx = 0;
         int recordNo=1;
+        int sumRecordLength=0;
 
         RawFile readFile = new RawFile(); // Create Object from class readRaw
         int[] rawFileInt = readFile.readBinaryFile //                 ("C:\\Users\\Samreng\\Documents\\HSPA\\CDR Project\\CDR_Description PS_R8\\raw_PS_R8\\PGW\\006295981_20160428091436.cdr");
                 //                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\0000204700_20140403221949.cdr");
-                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample.cdr");
+//                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample.cdr");
 //                 ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\006295981_20160428091436_sample.cdr");
 //                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample2.cdr");
-//                ("C:\\Users\\Samreng\\Documents\\HSPA\\CDR Project\\CDR_Description PS_R8\\pscdr2text\\0000211585_20140920201238.cdr");
+                ("C:\\Users\\Samreng\\Documents\\HSPA\\CDR Project\\CDR_Description PS_R8\\pscdr2text\\0000211585_20140920201238.cdr");
 //                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\b00000001.dat");
         int fileLength = rawFileInt.length;
         System.out.println("File length = " + fileLength + "|0x" + String.format("%02X", fileLength) + " Byte"); // Debug
@@ -57,9 +58,11 @@ public class Main_PGW {
         String record_type_hex_str = String.format("%02X", rawFileInt[fileIndex]) + String.format("%02X", rawFileInt[fileIndex + 1]);
         if ("BF4F".equals(record_type_hex_str)) {
             fileIndex = fileIndex + 2;
+            sumRecordLength=sumRecordLength+2;
             System.out.println("Addr:" + fileIndex + " is PGW Record"); // Debug Print out
             int record_len_byte = rawFileInt[fileIndex] - 0x80; //Check number of Byte is define Record length (1 or 2 Byte)
             fileIndex++;
+            sumRecordLength=sumRecordLength+record_len_byte+1;  // +1 = LengthByte
             for (int i = 0; i < record_len_byte; i++) {
                 field_hex_str = field_hex_str + String.format("%02X", rawFileInt[fileIndex]);
                 fileIndex++;
@@ -79,6 +82,7 @@ System.out.println("field_hex_str:"+field_hex_str);     //Debug
 
 
 int record_length = data_conv.hexString2int(field_hex_str); // Calculate Record length ( xxx Byte)
+sumRecordLength=sumRecordLength+record_length;
 //            System.out.println("Rec len Str:"+field_hex_str);         // Debug print
             System.out.println("Record length:" + record_length + " Byte");    // Debug print
 //            System.out.println("Raw File @file_indx:"+rawFileInt[file_indx]);   // Debug print
@@ -222,13 +226,13 @@ System.out.println("fileLength:" + "0x" + String.format("%02X", fileLength) + " 
                 }
                 
             }
-            while (record_indx < record_length);    
-//            while (fileIndex < record_length);
+//            while (record_indx < record_length);    
+            while (fileIndex < sumRecordLength);
         } else {
             System.out.println("fileIndex:0x"+String.format("%02X",fileIndex)+" record_indx:0x"+String.format("%02X",record_indx)+" Not PGW-Record");
         }
         recordNo++;
-    }while(fileIndex < fileLength);
+    }while((fileIndex+1) < fileLength);     // +1Byet for adjust length (protect array out of bound)
         
     }
 }
