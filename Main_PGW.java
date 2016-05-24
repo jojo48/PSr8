@@ -38,8 +38,8 @@ public class Main_PGW {
                 //                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample.cdr");
                 //                 ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\006295981_20160428091436_sample.cdr");
                 //                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample2.cdr");
-                //                ("C:\\Users\\Samreng\\Documents\\HSPA\\CDR Project\\CDR_Description PS_R8\\pscdr2text\\0000211585_20140920201238.cdr");
-                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140920201238_sample_x30x80.cdr");
+                                ("C:\\Users\\Samreng\\Documents\\HSPA\\CDR Project\\CDR_Description PS_R8\\pscdr2text\\0000211585_20140920201238.cdr");
+//                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140920201238_sample_x30x80.cdr");
 //                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\b00000001.dat");
         int fileLength = rawFileInt.length;
         System.out.println("File length = " + fileLength + "|0x" + String.format("%02X", fileLength) + " Byte"); // Debug
@@ -87,23 +87,31 @@ public class Main_PGW {
                     System.out.println("------------------- Start of field (Record:" + recordNo + ") --------------------");
                     if (fieldConfig.contains(tag_1hex_str + ",")) {     // Check 1Byte Tag field is in Tag list table
 
-//---------- Special check for Tag [xAC x81 (x80...x83)] not found in manual----------                    
-                        if (("xAC".equals(tag_1hex_str)) && (rawFileInt[fileIndex + 1] > 0x80) && (rawFileInt[fileIndex + 3] == 0x30)) {
-                            fileIndex += 3;       //Skip 3Byte
-                            record_indx += 3;    //Skip 3Byte
-                            // ------- Check all sub field x30 Length -------
-                            int x30_indx = fileIndex;
-                            int x30_len = rawFileInt[x30_indx + 1] + 2;    //+1Byte for Skip tag x30; +2Byte(Tag+Length Byte)
-
-                            while (rawFileInt[(x30_indx + x30_len)] == 0x30) {
-                                x30_len = x30_len + 2 + rawFileInt[(x30_indx + x30_len + 1)];    //+2Byte for Skip Tag and Length Byte
-                            }
-                            int[] field_raw_int = new int[x30_len];
-                            for(int i=0; i<x30_len;i++){
-                                field_raw_int[i]=rawFileInt[fileIndex];
-                                fileIndex++;
-                            }
-                        }
+                        
+                        
+                        
+////---------- Special check for Tag [xAC x81 (x80...x83)] not found in manual----------                    
+//                        if (("xAC".equals(tag_1hex_str)) && (rawFileInt[fileIndex + 1] > 0x80) && (rawFileInt[fileIndex + 3] == 0x30)) {
+//                            fileIndex += 3;       //Skip 3Byte
+//                            record_indx += 3;    //Skip 3Byte
+//                            // ------- Check all sub field x30 Length -------
+//                            int x30_indx = fileIndex;
+//                            int x30_len = rawFileInt[x30_indx + 1] + 2;    //+1Byte for Skip tag x30; +2Byte(Tag+Length Byte)
+//
+//                            while (rawFileInt[(x30_indx + x30_len)] == 0x30) {
+//                                x30_len = x30_len + 2 + rawFileInt[(x30_indx + x30_len + 1)];    //+2Byte for Skip Tag and Length Byte
+//                            }
+//                            int[] field_raw_int = new int[x30_len];
+//                            for(int i=0; i<x30_len;i++){
+//                                field_raw_int[i]=rawFileInt[fileIndex];
+//                                fileIndex++;
+//                            }
+//                        }
+////---------- End of Special check for Tag [xAC x81 (x80...x83)] not found in manual----------
+                        
+                        
+                        
+                        
 
                         System.out.print("Field Tag: " + tag_1hex_str + "   Address: 0x" + String.format("%02X", fileIndex) + "  "); // Debug print
                         fileIndex++;
@@ -115,8 +123,45 @@ public class Main_PGW {
                         if ("1".equals(field_decode)) {
 //                        System.out.println("File Index(StartValue):" + String.format("%02X", file_indx + 1)); // Debug print
 
+
+
+//---------- Special check for Tag [xAC x81 (x80...x83)] not found in manual----------                    
+                        if (("xAC".equals(tag_1hex_str)) && (rawFileInt[fileIndex] > 0x80) && (rawFileInt[fileIndex + 2] == 0x30)) {
+                            fileIndex += 2;       //Skip 2Byte
+                            record_indx += 2;    //Skip 2Byte
+                            // ------- Check all sub field x30 Length -------
+                            int x30_indx = fileIndex;
+                            int x30_len = rawFileInt[x30_indx + 1] + 2;    //+1Byte for Skip tag x30; +2Byte(Tag+Length Byte)
+
+                            while (rawFileInt[(x30_indx + x30_len)] == 0x30) {
+                                x30_len = x30_len + 2 + rawFileInt[(x30_indx + x30_len + 1)];    //+2Byte for Skip Tag and Length Byte
+                            }
+                            
+                            int[] field_raw_int = new int[x30_len];
+                            for(int i=0; i<x30_len;i++){
+                                field_raw_int[i]=rawFileInt[fileIndex];
+                                fileIndex++;
+                            }
                             
                             
+                             //Example data for call method decoder==> xAC,[120,12,2, ...],xAC,1,listOfTrafficVolumes,SEQUENCE OF ChangeOfCharCondition
+                            String field_decode_data = decode.decoder(tag_1hex_str, field_raw_int, field_conf);
+                            record_decode_data = record_decode_data + "|" + field_decode_data;
+
+                            System.out.println("length: " + field_length + "|0x" + String.format("%02X", field_length) + " Byte");    // Debug print
+                            System.out.println("Field Decode Data:" + field_decode_data);     // Debug print
+//                        System.out.println("File Index:"+String.format("%02X", file_indx)); // Debug print
+//                        record_indx < record_length
+                            System.out.println("file_indx:" + "0x" + String.format("%02X", fileIndex) + " record_length:" + "0x" + String.format("%02X", +record_length) + " record_indx:" + "0x" + String.format("%02X", +record_indx) + " field_length:" + "0x" + String.format("%02X", field_length));   //Debug
+                            System.out.println("fileLength:" + "0x" + String.format("%02X", fileLength) + " fileIndx:" + "0x" + String.format("%02X", +fileIndex)); //Debug
+
+                            
+                            
+                        }
+//---------- End of Special check for Tag [xAC x81 (x80...x83)] not found in manual----------
+                        else{
+                            
+                           
                             
                             
                             
@@ -139,7 +184,7 @@ public class Main_PGW {
 //                        record_indx < record_length
                             System.out.println("file_indx:" + "0x" + String.format("%02X", fileIndex) + " record_length:" + "0x" + String.format("%02X", +record_length) + " record_indx:" + "0x" + String.format("%02X", +record_indx) + " field_length:" + "0x" + String.format("%02X", field_length));   //Debug
                             System.out.println("fileLength:" + "0x" + String.format("%02X", fileLength) + " fileIndx:" + "0x" + String.format("%02X", +fileIndex)); //Debug
-
+}
                         } else {
                             fileIndex = fileIndex + field_length + 1;   // Skip file index to next field
                             record_indx = record_indx + field_length + 1;     // Add field_length to field_indx for correct field_indx position

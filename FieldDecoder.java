@@ -206,7 +206,7 @@ public class FieldDecoder {
                         field_decode_data = field_decode_data + "," + decode_data_xAC_x30;
                     } while (xAC_indx < xAC_len);
                 } else {
-                    field_decode_data = "Unknow Tag";
+                    field_decode_data = " Unknow Tag";
                 }
 
                 field_decode_data = field_decode_data.substring(1, field_decode_data.length());  //trim first comma (,)
