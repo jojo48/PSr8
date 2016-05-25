@@ -37,6 +37,9 @@ class SubFieldDecoder {
     }
 
     String xAC_x30_decode(int[] raw_xAC_x30_sub) {
+        
+        Main_PGW Main_PGW = new Main_PGW();     // Create Object Main_PGW
+        
         int raw_xAC_x30_sub_len = raw_xAC_x30_sub.length;
 
         int[] raw_xAC_x30_sub1 = new int[raw_xAC_x30_sub_len - 2];
@@ -60,13 +63,18 @@ class SubFieldDecoder {
 
 //--------------------------------- Start x83 (dataVolumeMBMSUplink) ---------------------------------
             case "x83":
-                decode_data_xAC_x30_sub = "dataVolumeUplink:" + Integer.toString(DataConverter.hexString2int(DataConverter.Int2HexString(raw_xAC_x30_sub1)));
+                int dataVolumeUplink=DataConverter.hexString2int(DataConverter.Int2HexString(raw_xAC_x30_sub1)); 
+                Main_PGW.DataUplink(dataVolumeUplink);  //Sum data volume uplink
+                decode_data_xAC_x30_sub = "dataVolumeUplink:" + Integer.toString(dataVolumeUplink);
                 return decode_data_xAC_x30_sub;
 //--------------------------------- End x83 ---------------------------------//--------------------------------- End x83 ---------------------------------
 
 //--------------------------------- Start x84 (dataVolumeMBMSDownlink) ---------------------------------
             case "x84":
-                decode_data_xAC_x30_sub = "dataVolumeDownlink:" + Integer.toString(DataConverter.hexString2int(DataConverter.Int2HexString(raw_xAC_x30_sub1)));
+                int dataVolumeDownlink=DataConverter.hexString2int(DataConverter.Int2HexString(raw_xAC_x30_sub1));
+                Main_PGW.DataDownlink(dataVolumeDownlink);  //Sum data volume downlink
+               decode_data_xAC_x30_sub = "dataVolumeDownlink:" + Integer.toString(dataVolumeDownlink);
+               
                 return decode_data_xAC_x30_sub;
 //--------------------------------- End x84 ---------------------------------//--------------------------------- End x84 ---------------------------------
 

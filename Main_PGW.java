@@ -15,6 +15,22 @@ import java.io.IOException;
  */
 public class Main_PGW {
 
+    public static int sumDataUplink_file = 0;
+    public static int sumDataDownlink_file = 0;
+    public static int sumDataUplink_record = 0;
+    public static int sumDataDownlink_record = 0;
+
+    public void DataUplink(int dataUplink) {
+        sumDataUplink_file = sumDataUplink_file + dataUplink;
+        sumDataUplink_record = sumDataUplink_record + dataUplink;
+
+    }
+
+    public void DataDownlink(int dataDownlink) {
+        sumDataDownlink_file = sumDataDownlink_file + dataDownlink;
+        sumDataDownlink_record = sumDataDownlink_record + dataDownlink;
+    }
+
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
         FileIO FileIO = new FileIO();
@@ -24,15 +40,16 @@ public class Main_PGW {
         String fieldConfig = readConfig[1];
 
         int fileIndex = 0;
-        int fieldLength = 0;
-        int record_byte = 0;
-        String record_type, tag_1hex_str, tag_2hex_str, tag_3hex_str;
+//        int fieldLength = 0;
+//        int record_byte = 0;
+//        String record_type;
+        String tag_1hex_str, tag_2hex_str, tag_3hex_str;
 
         int record_indx = 0;
 //        int recordEndAddress=0;   //use sumRecordLength
         int recordCount = 1;
         int recordErrorCount = 0;
-        String recordErrorList="";
+        String recordErrorList = "";
         int sumRecordLength = 0;
 
         RawFile readFile = new RawFile(); // Create Object from class readRaw
@@ -84,11 +101,12 @@ public class Main_PGW {
                 String record_decode_data = ""; // Recodr data buffer
 //            String field_decode_data = ""; // Recodr data buffer
 
-//---------------- Start of loop field process ------------------------     
+//---------------- Start of loop record process ------------------------     
                 try {
 
                     do {
-
+                        sumDataUplink_record = 0;
+                        sumDataDownlink_record = 0;
 //---------- Start of Check Tag field length 1,2,3Byte ---------------------
                         tag_1hex_str = "x" + String.format("%02X", rawFileInt[fileIndex]);    // Convert Integer to Hex String for check Tag field 1Byte
 
@@ -272,21 +290,21 @@ public class Main_PGW {
 //                                break;  // Break or Return
 //*************  Skip to next Record and count error **********
                                     recordErrorCount++;
-                                    recordErrorList=recordErrorList+recordCount+",";
+                                    recordErrorList = recordErrorList + recordCount + ",";
                                     fileIndex = sumRecordLength;     //Skip Record error
 
                                 }
                             }
                         }
-
+                        System.out.println("SumDataVolumeUplink: " + sumDataUplink_record + " ;  SumDataVolumeDownlink: " + sumDataDownlink_record);
                     } //            while (record_indx < record_length);    
                     while (fileIndex < sumRecordLength);
 
                 } catch (Exception ex) {
-                    System.out.println("Process Record Error!!!");
-                    
+                    System.out.println("Record Error Raw data invalid format!!!");
+
                     recordErrorCount++;
-                    recordErrorList=recordErrorList+recordCount+",";
+                    recordErrorList = recordErrorList + recordCount + ",";
                     fileIndex = sumRecordLength;     //Skip Record error
                 }
 
@@ -297,9 +315,12 @@ public class Main_PGW {
         } while ((fileIndex + 1) < fileLength);     // +1Byet for adjust length (protect array out of bound)
 
 //----------------- End of File Summarry Report -------------------  
-        recordErrorList=recordErrorList.substring(0, (recordErrorList.length()-1));
+        if (recordErrorList.length() > 0) {
+            recordErrorList = "[" + recordErrorList.substring(0, (recordErrorList.length() - 1)) + "]";
+        }
         System.out.println("");
         System.out.println("***************************************** End of file *****************************************");
-        System.out.println("Record Total:" + (recordCount - 1) + " ;  Records Error:" + recordErrorCount +"["+recordErrorList+"] ; " +"  Raw Data Remaining(can't process):" + (fileLength - (fileIndex + 1)) + " Byte");
+        System.out.println("Record Total:" + (recordCount - 1) + " ;  Records Error:" + recordErrorCount + recordErrorList + " ; " + "  Raw Data Remaining(can't process):" + (fileLength - (fileIndex + 1)) + " Byte");
+        System.out.println("SumDataVolumeUplink: " + sumDataUplink_file + " ;  SumDataVolumeDownlink: " + sumDataDownlink_file);
     }
 }
