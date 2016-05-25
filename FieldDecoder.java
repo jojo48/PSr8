@@ -189,11 +189,6 @@ public class FieldDecoder {
                     int xAC_indx = 0;
                     int xAC_len = field_raw_data.length;
                     
-//                    int xAC_sub_len;
-
-//                    String[] str_decode = new String[3];  //Debug
-//                    int arr_indx = 0;                     //Debug
-
                     do {
                         int xAC30_sub_len = field_raw_data[xAC_indx + 1];  //  +2 for TagHeader & Length
                         int[] raw_xAC_x30 = new int[xAC30_sub_len];
@@ -207,7 +202,7 @@ public class FieldDecoder {
                         field_decode_data = field_decode_data + "," + decode_data_xAC_x30;
                     } while (xAC_indx < xAC_len);
                 } else {
-                    field_decode_data = " Unknow Tag";
+                    field_decode_data = " Unknow subTag xAC...";
                 }
 
                 field_decode_data = field_decode_data.substring(1, field_decode_data.length());  //trim first comma (,)
@@ -333,7 +328,7 @@ public class FieldDecoder {
 
 //---------------------- Start of case Default ----------------------
             default:
-                field_decode_data = "Unknow Field:" + DataConverter.Int2HexString(field_raw_data);
+                field_decode_data = "Unknow Field to decoder:" + DataConverter.Int2HexString(field_raw_data);
                 return field_decode_data;
         }
     }

@@ -39,6 +39,7 @@ class SubFieldDecoder {
     String xAC_x30_decode(int[] raw_xAC_x30_sub) {
         
         Main_PGW Main_PGW = new Main_PGW();     // Create Object Main_PGW
+        PGW2TXT PGW2TXT =new PGW2TXT();
         
         int raw_xAC_x30_sub_len = raw_xAC_x30_sub.length;
 
@@ -65,6 +66,7 @@ class SubFieldDecoder {
             case "x83":
                 int dataVolumeUplink=DataConverter.hexString2int(DataConverter.Int2HexString(raw_xAC_x30_sub1)); 
                 Main_PGW.DataUplink(dataVolumeUplink);  //Sum data volume uplink
+                PGW2TXT.DataUplink(dataVolumeUplink);
                 decode_data_xAC_x30_sub = "dataVolumeUplink:" + Integer.toString(dataVolumeUplink);
                 return decode_data_xAC_x30_sub;
 //--------------------------------- End x83 ---------------------------------//--------------------------------- End x83 ---------------------------------
@@ -73,6 +75,7 @@ class SubFieldDecoder {
             case "x84":
                 int dataVolumeDownlink=DataConverter.hexString2int(DataConverter.Int2HexString(raw_xAC_x30_sub1));
                 Main_PGW.DataDownlink(dataVolumeDownlink);  //Sum data volume downlink
+                PGW2TXT.DataDownlink(dataVolumeDownlink);
                decode_data_xAC_x30_sub = "dataVolumeDownlink:" + Integer.toString(dataVolumeDownlink);
                
                 return decode_data_xAC_x30_sub;
