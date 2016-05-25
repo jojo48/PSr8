@@ -171,7 +171,7 @@ class SubFieldDecoder {
     }
 
     String userLocInfo(int[] raw_loc_info) {
-        String decode_user_loc_info = "";
+        String decode_user_loc_info;
 
         int[] plmn_raw = new int[3];
         for (int i = 0; i < 3; i++) {

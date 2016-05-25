@@ -80,7 +80,7 @@ public class FieldDecoder {
                 String sub_field_type;
                 String sub_field_list = "x80|x81|x82|x83|";
                 int field_len = field_raw_data.length;
-                int remain_raw_xA6 = field_len;
+//                int remain_raw_xA6 = field_len;
                 int sub_field_len;
                 field_decode_data = "{";
 
@@ -152,7 +152,7 @@ public class FieldDecoder {
 
 //---------------------- Start of case xA9 (servedPDPPDNAddress) ----------------------
             case "xA9":
-                int field_raw_length = field_raw_data.length;
+//                int field_raw_length = field_raw_data.length;
 
                 if (field_raw_data[0] == 0xA0) {        // iPAddress
                     int sub_field_length = field_raw_data[1];
@@ -188,10 +188,11 @@ public class FieldDecoder {
                     String decode_data_xAC_x30;
                     int xAC_indx = 0;
                     int xAC_len = field_raw_data.length;
-                    int xAC_sub_len;
+                    
+//                    int xAC_sub_len;
 
-                    String[] str_decode = new String[3];  //Debug
-                    int arr_indx = 0;                     //Debug
+//                    String[] str_decode = new String[3];  //Debug
+//                    int arr_indx = 0;                     //Debug
 
                     do {
                         int xAC30_sub_len = field_raw_data[xAC_indx + 1];  //  +2 for TagHeader & Length
@@ -332,7 +333,7 @@ public class FieldDecoder {
 
 //---------------------- Start of case Default ----------------------
             default:
-                field_decode_data = "Unknow TAG:" + DataConverter.Int2HexString(field_raw_data);
+                field_decode_data = "Unknow Field:" + DataConverter.Int2HexString(field_raw_data);
                 return field_decode_data;
         }
     }
