@@ -43,6 +43,7 @@ public class PGW2TXT {
         
         int fieldCount=Integer.parseInt(readConfig[2]);   
         String [] fieldList=new String[fieldCount+2];     // array for store field list  //+2 for sumUplink, sumDownlink
+        String[] dataDecodeBuffer=new String[...];  // Create ArrayList
         int fieldConfig_len = fieldConfig.length();
         int fieldConfig_indx=0;
         int tagIndex;
@@ -343,5 +344,7 @@ public class PGW2TXT {
         System.out.println("***************************************** End of file *****************************************");
         System.out.println("Record Total:" + (recordCount - 1) + " ;  Records Error:" + recordErrorCount + recordErrorList + " ; " + "  Raw Data Remaining(can't process):" + (fileLength - (fileIndex + 1)) + " Byte");
         System.out.println("SumDataVolumeUplink: " + sumDataUplink_file + " ;  SumDataVolumeDownlink: " + sumDataDownlink_file);
+        
+        System.out.println("fieldList: "+fieldList[2]+" "+fieldList[3]+" "+fieldList[4]+" "+fieldList[5]+" "+fieldList[6]+" "+fieldList[7]+" "+fieldList[8]); //Debug
     }
 }
