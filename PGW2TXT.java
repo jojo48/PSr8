@@ -5,15 +5,11 @@
  */
 package pgw;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import static java.lang.ProcessBuilder.Redirect.to;
-import static java.lang.System.exit;
-import static java.util.Collections.list;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import static javax.imageio.ImageIO.write;
 //import java.lang.reflect.Method;
 
 /**
@@ -36,39 +32,70 @@ public class PGW2TXT {
         sumDataDownlink_file = sumDataDownlink_file + dataDownlink;
         sumDataDownlink_record = sumDataDownlink_record + dataDownlink;
     }
-
-    int CountRecord(int[] rawFile) {
-        DataConverter DataConverter = new DataConverter();
-        int recordCount = 0;
-        int rawFile_indx = 0;
-        int rawFile_len = rawFile.length;
-        String tagRawFile;
-        do {
-            String record_len_str = "0x";
-            if ("BF4F".equals(tagRawFile = String.format("%02X", rawFile[rawFile_indx]) + String.format("%02X", rawFile[rawFile_indx + 1]))) {
-                recordCount++;
-                rawFile_indx += 2;
-                int record_len_byte = rawFile[rawFile_indx] - 0x80;
-                rawFile_indx++;
-                for (int j = 0; j < record_len_byte; j++) {
-                    record_len_str = record_len_str + String.format("%02X", rawFile[rawFile_indx]);
-                    rawFile_indx++;
-                }
-            }
-            rawFile_indx = rawFile_indx + DataConverter.hexString2int(record_len_str);
-        } while (rawFile_indx < rawFile_len - 1);
-        return recordCount;
-    }
+// ########################### Count Number of Record ###############################
+//    int CountRecord(int[] rawFile) {
+//        DataConverter DataConverter = new DataConverter();
+//        int recordCount = 0;
+//        int rawFile_indx = 0;
+//        int rawFile_len = rawFile.length;
+//        String tagRawFile;
+//        do {
+//            String record_len_str = "0x";
+//            if ("BF4F".equals(tagRawFile = String.format("%02X", rawFile[rawFile_indx]) + String.format("%02X", rawFile[rawFile_indx + 1]))) {
+//                recordCount++;
+//                rawFile_indx += 2;
+//                int record_len_byte = rawFile[rawFile_indx] - 0x80;
+//                rawFile_indx++;
+//                for (int j = 0; j < record_len_byte; j++) {
+//                    record_len_str = record_len_str + String.format("%02X", rawFile[rawFile_indx]);
+//                    rawFile_indx++;
+//                }
+//            }
+//            rawFile_indx = rawFile_indx + DataConverter.hexString2int(record_len_str);
+//        } while (rawFile_indx < rawFile_len - 1);
+//        return recordCount;
+//    }
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
         FileIO FileIO = new FileIO();
         String pathFileConfig = "D:\\Training\\Java\\SourceCode\\pgw\\PGWr8.csv";
         String[] readConfig = FileIO.ReadFileConfig(pathFileConfig);    //Return with array of header group
-        String pathConfig = readConfig[0];
-        String fieldConfig = readConfig[1];
+        String pathConfig = readConfig[0];  // String of Path Configuration
+        String fieldConfig = readConfig[1]; // String of Tag Field list
         String record_decode_data; // Recodr data buffer
+        
+int pathConfig_indxStart;
+        int pathConfig_indxEnd = 0;
+        int offsetStart = 0;            // use for check and Skip "|"
 
+        HashMap<String, String> listPathConfig = new HashMap<>();  //Create HashMap for store field data decoded
+
+        do {
+            pathConfig_indxStart = pathConfig_indxEnd + offsetStart;
+            pathConfig_indxEnd = pathConfig.indexOf("|", pathConfig_indxEnd + 1);
+            String pathItem = pathConfig.substring(pathConfig_indxStart, pathConfig.indexOf("|", pathConfig_indxEnd));
+//            System.out.println(pathItem);                                               // Debug
+            String key = pathItem.substring(0, pathItem.indexOf("="));
+            String val = pathItem.substring(pathItem.indexOf("=") + 1, pathItem.length());
+            listPathConfig.put(key, val);  // push to HashMapArray
+//            System.out.println("key:" + key + "    " + "val:" + val);                   // Debug
+//            System.out.println("");                                                     // Debug
+            offsetStart = 1;      // Skip "|"
+        } while (pathConfig_indxEnd + 1 < pathConfig.length());
+        
+        System.out.println("GetRawPath:"+listPathConfig.get("RawData"));                //Debug
+        System.out.println("GetDecodeDataPath:"+listPathConfig.get("DecodeData"));      //Debug
+        System.out.println("GetRawZip:"+listPathConfig.get("ZipData"));                //Debug
+        System.out.println("GetPath(no-key):"+listPathConfig.get("no-key"));            //Debug
+        
+        
+        
+        
+        
+        
+//        ArrayList<String> myArrList = new ArrayList<String>();
+        ArrayList<String> arrayRecordData = new ArrayList<>();      //array for store record decode data before write to text file
         int fieldCount = Integer.parseInt(readConfig[2]);
         String[] arrayFieldList = new String[fieldCount + 2];     // array for store field list  //+2 for sumUplink, sumDownlink
 
@@ -102,10 +129,10 @@ public class PGW2TXT {
 
         RawFile readFile = new RawFile(); // Create Object from class readRaw
         int[] rawFileInt = readFile.readBinaryFile //                 ("C:\\Users\\Samreng\\Documents\\HSPA\\CDR Project\\CDR_Description PS_R8\\raw_PS_R8\\PGW\\006295981_20160428091436.cdr");
-                //                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\0000204700_20140403221949.cdr");
+                                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\0000204700_20140403221949.cdr");
                 //                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample.cdr");
 //                                                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample3.cdr");
-                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample4.cdr");
+//                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample4.cdr");
         //                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample_fieldErr.cdr");
 //                ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\006295981_20160428091436_sample.cdr");
 //                        ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample2.cdr");
@@ -115,10 +142,10 @@ public class PGW2TXT {
         int fileLength = rawFileInt.length;
         System.out.println("File length = " + fileLength + "|0x" + String.format("%02X", fileLength) + " Byte"); // Debug
 
-        PGW2TXT PGW2TXT = new PGW2TXT();
-        int noOfRecord = PGW2TXT.CountRecord(rawFileInt);
-                
- System.out.println("noOfRecord (BF4F):" + noOfRecord);  //Debug
+//        PGW2TXT PGW2TXT = new PGW2TXT();
+//        int noOfRecord = PGW2TXT.CountRecord(rawFileInt);
+//                
+// System.out.println("noOfRecord (BF4F):" + noOfRecord);  //Debug
 
         
         
@@ -129,8 +156,8 @@ public class PGW2TXT {
 
 //---------------- Start of loop file process ------------------------
 //        try { 
-           int recordDataBuffer_indx=0;
-           String[] recordDataBuffer= new String[noOfRecord];  //Array for store record data (decoded)
+//           int recordDataBuffer_indx=0;
+//           String[] recordDataBuffer= new String[noOfRecord];  //Array for store record data (decoded)
         do {
             record_decode_data = "";    // Reset Recodr data buffer
             String field_hex_str = "";  // Reset old record length
@@ -405,6 +432,8 @@ public class PGW2TXT {
                 
             System.out.println("recordFieldData:"+recordFieldData);     //Debug
             
+            arrayRecordData.add(recordFieldData);   //write to array buffer before write to text file
+            
             mapFieldData.clear();   // Clear array buffer
             
             
@@ -420,8 +449,8 @@ public class PGW2TXT {
             
             
                     
-            recordDataBuffer[recordDataBuffer_indx]=record_decode_data;     
-            recordDataBuffer_indx++;
+//            recordDataBuffer[recordDataBuffer_indx]=record_decode_data;     
+//            recordDataBuffer_indx++;
             
         } while ((fileIndex + 1) < fileLength);     // +1Byet for adjust length (protect array out of bound)
 //        catch(Exception ex){
@@ -437,6 +466,59 @@ public class PGW2TXT {
         System.out.println("Record Total:" + (recordCount - 1) + " ;  Records Error:" + recordErrorCount + recordErrorList + " ; " + "  Raw Data Remaining(can't process):" + (fileLength - (fileIndex + 1)) + " Byte");
         System.out.println("SumDataVolumeUplink: " + sumDataUplink_file + " ;  SumDataVolumeDownlink: " + sumDataDownlink_file);
 
-        System.out.println("fieldList: " + arrayFieldList[0] + " " + arrayFieldList[1] + " " + arrayFieldList[2] + " " + arrayFieldList[3] + " " + arrayFieldList[4] + " " + arrayFieldList[5] + " " + arrayFieldList[6]); //Debug
+        
+        
+//        System.out.println("fieldList: " + arrayFieldList[0] + " " + arrayFieldList[1] + " " + arrayFieldList[2] + " " + arrayFieldList[3] + " " + arrayFieldList[4] + " " + arrayFieldList[5] + " " + arrayFieldList[6]); //Debug
+        
+        System.out.println("");                         // Debug
+        for (String temp : arrayFieldList){             // Debug
+            System.out.print(temp+"|");                 // Debug
+            }
+        System.out.println("");                         // Debug
+
+ 
+        
+        
+        
+        
+        
+//        ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample4.cdr");
+        String rawFileName="20140403221949.cdr";
+        
+        String writeFileName=listPathConfig.get("DecodeData")+rawFileName+".txt";
+        
+        
+        FileIO.bufferWriter(writeFileName,arrayRecordData);     // Write output to text file
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        arrayRecordData.stream().forEach((temp) -> {    // Debug
+            System.out.println(temp);                   // Debug
+        });                                             // Debug
+        System.out.println("");                         // Debug
+        System.out.println("arrayRecordData size (Before clear):"+arrayRecordData.size());  // Debug
+        System.out.println("arrayRecordData0 (Before clear):"+arrayRecordData.get(0));      // Debug
+        
+        arrayRecordData.clear();
+        
+        System.out.println("arrayRecordData size (After clear):"+arrayRecordData.size());   // Debug
+        
+        
+        
     }
 }

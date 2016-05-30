@@ -6,9 +6,12 @@
 package pgw;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 /**
  *
@@ -61,13 +64,6 @@ public class FileIO {
                         }
                     }
                 }
-//                String[] config = new String[3+tagCount];    //[0]= pathConfig, [1]=fieldConfig, [2]=tagCount, [4](tagList) {5...
-//                config[0] = pathConfig;
-//                config[1] = fieldConfig;
-//                config[2] = Integer.toString(tagCount);
-//                for(int i=0; i<tagCount;i++){
-//                    config[i+3]=fieldList[i];
-//                }
             }
         } catch (IOException e) {
             System.out.println("Can't read file:" + file);    // TODO Auto-generated catch block
@@ -76,11 +72,46 @@ public class FileIO {
         config[0] = pathConfig;
         config[1] = fieldConfig;
         config[2] = Integer.toString(tagCount);
-        for (int i = 0; i < tagCount; i++) {
-            config[i + 3] = fieldList[i];
-        }
+
+//         for (int i = 0; i < tagCount; i++) {
+//            config[i + 3] = fieldList[i];
+//        }
+        System.arraycopy(fieldList, 0, config, 3, tagCount);
 
         return config;
     }
 
+    boolean FileWriter(String fileName, String data) {
+        File file = new File(fileName);
+        FileWriter fileWrite;
+        try {
+            fileWrite = new FileWriter(file);
+            fileWrite.write(data);
+            fileWrite.close();
+        } catch (IOException e) {
+            System.out.println("Error write to file: " + fileName);   //Debug
+            return false;
+        }
+        return true;
+    }
+//List<Integer> list
+    boolean bufferWriter(String fileName, List<String> data ) {
+
+        File file = new File(fileName);
+        FileWriter fileWrite;
+        BufferedWriter bufferWrite;
+        try {
+            fileWrite = new FileWriter(file);
+            bufferWrite = new BufferedWriter(fileWrite);
+            for (String data1 : data) {
+                bufferWrite.write(data1 + System.getProperty("line.separator"));
+            }
+            bufferWrite.close();
+            fileWrite.close();
+        } catch (IOException e) {
+            System.out.println("Error write to file: " + fileName);   //Debug
+            return false;
+        }
+        return true;
+    }
 }
