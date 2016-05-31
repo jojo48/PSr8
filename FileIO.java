@@ -10,7 +10,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +21,77 @@ import java.util.List;
  */
 public class FileIO {
 
+    void createDirectory(String directoryName) {
+        File theDir = new File(directoryName);
+
+        // if the directory does not exist, create it
+        if (!theDir.exists()) {
+            System.out.println("creating directory: " + directoryName);     // Debug
+            theDir.mkdir();
+        } else {
+            System.out.println("Directory " + directoryName + " is exists");    //Debug
+        }
+    }
+//    
+//    
+//    
+//    
+//    
+//    
+//    
+//    
+
+    public List<String> ListFileByExtension(String folder, String ext) {
+        
+        ArrayList<String> arrayListFile = new ArrayList<>();      //array for store fileName
+//        arrayRecordData.add(recordFieldData);
+        
+        GenericExtFilter filter = new GenericExtFilter(ext);
+        File dir = new File(folder);
+        if (dir.isDirectory() == false) {
+            System.out.println("Directory does not exists : " + folder);    //FILE_DIR);    // Debug
+            return arrayListFile;
+        }
+
+        // list out all the file name and filter by the extension
+        String[] list = dir.list(filter) == null ? new String[0] : dir
+                .list(filter);
+
+        if (list.length == 0) {
+            System.out.println("no files end with : " + ext);           //Debug
+            return arrayListFile;
+        }
+
+        for (String file : list) {
+            String temp = new StringBuffer()    //(folder)  //.append(File.separator)
+                    .append(file).toString();
+            arrayListFile.add(temp);
+//            System.out.println("file : " + temp);             // Debug
+        }
+        return arrayListFile;
+    }
+
+    // inner class, generic extension filter
+    public class GenericExtFilter implements FilenameFilter {
+
+        private String ext;
+
+        public GenericExtFilter(String ext) {
+            this.ext = ext;
+        }
+
+        public boolean accept(File dir, String name) {
+            return (name.endsWith(ext));
+        }
+    }
+//
+//    
+//    
+//    
+//    
+//    
+//    
+    
     String[] ReadFileConfig(String path) {
         File file = new File(path);
 
@@ -95,7 +168,8 @@ public class FileIO {
         return true;
     }
 //List<Integer> list
-    boolean bufferWriter(String fileName, List<String> data ) {
+
+    boolean bufferWriter(String fileName, List<String> data) {
 
         File file = new File(fileName);
         FileWriter fileWrite;
