@@ -18,7 +18,6 @@ public class TestWriteTextFile {
     public static void main(String[] args) {
         FileIO FileIO =new FileIO();
         
-//		("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample4.cdr");
         String folderName = "D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\";
         String fileName = "20140403221949_sample4.cdr" + ".txt";
         String path;
@@ -41,8 +40,8 @@ public class TestWriteTextFile {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-//        } catch (Exception e) {
-//            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
         }
         
 // #######################################################################

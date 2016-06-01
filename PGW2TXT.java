@@ -5,9 +5,13 @@
  */
 package pgw;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -64,6 +68,10 @@ public class PGW2TXT {
         String pathConfig = readConfig[0];  // String of Path Configuration
         String fieldConfig = readConfig[1]; // String of Tag Field list
         String record_decode_data; // Recodr data buffer
+        
+//formatting numbers upto 2 decimal places in Java  // DecimalFormat DecimalFormat = new DecimalFormat("#,###,##0.00");
+        DecimalFormat DecimalFormat = new DecimalFormat("#,###,##0");  
+//        System.out.println(DecimalFormat.format(364565.14));          // Example use
 
         
 //#################################### Read Configuration and Store ArrayList ###############################################  
@@ -92,6 +100,10 @@ int pathConfig_indxStart;
         String pathFileError =listPathConfig.get("pathFileError");
         String rawFileExtension =listPathConfig.get("rawFileExtension");
         
+        
+        
+//        String timeStamp = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new Date());
+        
         FileIO.createDirectory(pathDecodeData);
         FileIO.createDirectory(pathZipData);
         FileIO.createDirectory(pathLogData);
@@ -99,7 +111,20 @@ int pathConfig_indxStart;
         
         List<String> arrayListFile=FileIO.ListFileByExtension(pathRawData, rawFileExtension);   // List RAW File from folder pathRawData
         
-
+ ArrayList<String> arrayLogData = new ArrayList<>();         //array for store log data before write to text file 
+ 
+ arrayLogData.add("Start Time "+(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date())));      // Start of log file
+ arrayLogData.add("------------------------------------ Path Configuration ------------------------------------");
+ arrayLogData.add("pathRawData:      "+pathRawData);
+ arrayLogData.add("pathDecodeData:   "+pathDecodeData);
+ arrayLogData.add("pathZipData:      "+pathZipData);
+ arrayLogData.add("pathLogData:      "+pathLogData);
+ arrayLogData.add("pathFileError:    "+pathFileError);
+ arrayLogData.add("rawFileExtension: "+rawFileExtension);
+ arrayLogData.add("");                                      // add space new line
+ 
+ 
+ 
         for (String data1 : arrayListFile) {                                                        //Debug
                System.out.println(data1);    //Debug   // System.getProperty("line.separator")      // Debug
         }                                                                                           // Debug
@@ -122,14 +147,17 @@ int pathConfig_indxStart;
        
        for(int rawFileNo=0;rawFileNo<totalRawFile;rawFileNo++){
            String fileName=arrayListFile.get(rawFileNo);
-           String rawFileName=pathRawData+fileName;
+           String rawFilePathName=pathRawData+fileName;
+           
+           
            System.out.println("=================================================================================");     // Debug
-           System.out.println("Decoding file: "+rawFileName);                                                           // Debug
+           System.out.println("Decoding file: "+rawFilePathName);                                                           // Debug
            System.out.println("=================================================================================");     // Debug
        
+         
         ArrayList<String> arrayRecordData = new ArrayList<>();      //array for store record decode data before write to text file
         int fieldCount = Integer.parseInt(readConfig[2]);
-        String[] arrayFieldList = new String[fieldCount + 2];     // array for store field list  //+2 for sumUplink, sumDownlink
+        String[] arrayFieldList = new String[fieldCount + 2];       // array for store field list  //+2 for sumUplink, sumDownlink
 
         int fieldConfig_len = fieldConfig.length();
         int fieldConfig_indx = 0;
@@ -149,15 +177,17 @@ int pathConfig_indxStart;
         int record_indx = 0;
         int recordCount = 1;
         int recordErrorCount = 0;
-        String recordErrorList = "";
+        String recordErrorList = "";    //use for add to integer for convert integer to string
         int sumRecordLength = 0;
        
 //        String rawFileName="20140403221949_sample3.cdr";     // Test and Debug
         
 //        String pathRawFile=listPathConfig.get("pathRawData")+rawFileName;
+        arrayLogData.add("------------------------------------ ("+DecimalFormat.format((rawFileNo+1))+"/"+DecimalFormat.format(totalRawFile)+") "+ fileName+" ------------------------------------");
+        arrayLogData.add("TimeBegin "+new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
         
         RawFile readFile = new RawFile(); // Create Object from class readRaw
-        int[] rawFileInt = readFile.readBinaryFile(rawFileName);
+        int[] rawFileInt = readFile.readBinaryFile(rawFilePathName);
 //           ("C:\\Users\\Samreng\\Documents\\HSPA\\CDR Project\\CDR_Description PS_R8\\raw_PS_R8\\PGW\\006295981_20160428091436.cdr");
 //           ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\0000204700_20140403221949.cdr");
 //           ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140403221949_sample.cdr");
@@ -170,6 +200,9 @@ int pathConfig_indxStart;
 //           ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140920201238_sample_x30x80.cdr");
 //           ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\b00000001.dat");
         int fileLength = rawFileInt.length;
+        
+        arrayLogData.add("FileSize "+DecimalFormat.format(fileLength)+" Byte");
+        
         System.out.println("File length = " + fileLength + "|0x" + String.format("%02X", fileLength) + " Byte"); // Debug
         
         FieldDecoder decode = new FieldDecoder();       // Create Object from class FieldDecoder
@@ -467,9 +500,83 @@ int pathConfig_indxStart;
 
 //        String writeFileName=pathDecodeData+rawFileName+".txt";
         String writeFileName=pathDecodeData+fileName+".txt";
-        FileIO.bufferWriter(writeFileName,arrayRecordData);     // Write output to text file
+//
+//------------ Check Folder Existing Before Write File ------------------------
+//        
+        File pathTextData = new File(pathDecodeData);
+         if (pathTextData.exists()) {
+             FileIO.bufferWriter(writeFileName,arrayRecordData);     // Write output to text file
+        } else {
+            System.out.println("Directory " + pathDecodeData + " is not exists !!!");
+        }
         
-        Check write to file complete ???
+        File textData = new File(writeFileName);
+         if (textData.exists()) {
+             System.out.println("Decode File: "+fileName+" FileSize "+DecimalFormat.format(fileLength)+" Bytes ==> "+DecimalFormat.format((recordCount-1))+"/"+DecimalFormat.format(recordErrorCount)+" Records(Total/Error)");
+
+        } else {
+            System.out.println("Directory " + pathDecodeData + " is not exists !!!");
+        }
+        
+//        FileIO.bufferWriter(writeFileName,arrayRecordData);     // Write output to text file
+        
+         
+         
+    writeFileName=pathLogData+"LogDecoder.txt";
+    
+         File pathLog = new File(pathLogData);
+         if (pathLog.exists()) {
+             FileIO.bufferWriter(writeFileName,arrayLogData);     // Write output to text file
+        } else {
+            System.out.println("Directory " + pathLogData + " does not exists !!!");
+        }
+        
+        File logData = new File(writeFileName);
+         if (logData.exists()) {
+             System.out.println("Decode File: "+fileName+" FileSize "+DecimalFormat.format(fileLength)+" Byte ==> Decoded "+DecimalFormat.format((recordCount-1))+"/"+DecimalFormat.format(recordErrorCount)+" Records(Total/Error)");
+
+        } else {
+            System.out.println("Directory " + pathDecodeData + " does not exists !!!");
+        }
+         
+         
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//        Check write to file complete ???
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+        
+        
+        
+        
         
 //        arrayRecordData.stream().forEach((temp) -> {    // Debug
 //            System.out.println(temp);                   // Debug
