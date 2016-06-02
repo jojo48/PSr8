@@ -127,7 +127,7 @@ int pathConfig_indxStart;
         
 FileIO.FileWriter(writeLogFileName,true,"\r\n"+"====================================== Start Time "
                 +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+" ======================================"+"\r\n");        
- FileIO.FileWriter(writeLogFileName,true,"------------------------------------ Path Configuration ------------------------------------"+"\r\n");
+ FileIO.FileWriter(writeLogFileName,true,"\r\n------------------------------------ Path Configuration ------------------------------------"+"\r\n");
  FileIO.FileWriter(writeLogFileName,true,"pathRawData:      "+pathRawData+"\r\n");
  FileIO.FileWriter(writeLogFileName,true,"pathDecodeData:   "+pathDecodeData+"\r\n");
  FileIO.FileWriter(writeLogFileName,true,"pathZipData:      "+pathZipData+"\r\n");
