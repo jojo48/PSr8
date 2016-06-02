@@ -32,20 +32,13 @@ public class FileIO {
             System.out.println("Directory " + directoryName + " is exists");    //Debug
         }
     }
-//    
-//    
-//    
-//    
-//    
-//    
-//    
-//    
+
 
     public List<String> ListFileByExtension(String folder, String ext) {
-        
+
         ArrayList<String> arrayListFile = new ArrayList<>();      //array for store fileName
 //        arrayRecordData.add(recordFieldData);
-        
+
         GenericExtFilter filter = new GenericExtFilter(ext);
         File dir = new File(folder);
         if (dir.isDirectory() == false) {
@@ -63,7 +56,7 @@ public class FileIO {
         }
 
         for (String file : list) {
-            String temp = new StringBuffer()    //(folder)  //.append(File.separator)
+            String temp = new StringBuffer() //(folder)  //.append(File.separator)
                     .append(file).toString();
             arrayListFile.add(temp);
 //            System.out.println("file : " + temp);             // Debug
@@ -91,7 +84,7 @@ public class FileIO {
 //    
 //    
 //    
-    
+
     String[] ReadFileConfig(String path) {
         File file = new File(path);
 
@@ -100,17 +93,11 @@ public class FileIO {
         String fieldConfig = "";
         String pathConfig = "";
         int tagCount = 0;
-        String[] fieldList = new String[300];   //array buffer for store field list
+        String[] fieldList = new String[300];   //array buffer for store field list ==> estimate not more than 300 field
 
 //        String[] config = new String[3];    //[0]= pathConfig, [1]=fieldConfig, [2]=tagCount
         try {
             try (BufferedReader bufferRead = new BufferedReader(new FileReader(file))) {
-//                String line;
-//                String tagHeader = "";
-//                String fieldConfig = "";
-//                String pathConfig = "";
-//                int tagCount=0;
-//                String[] fieldList = new String[300];   //array buffer for store field list
 
                 while ((line = bufferRead.readLine()) != null) {
                     line = line.trim();
@@ -154,11 +141,13 @@ public class FileIO {
         return config;
     }
 
-    boolean FileWriter(String fileName, String data) {
+
+
+    boolean FileWriter(String fileName,boolean writeMode, String data) {
         File file = new File(fileName);
         FileWriter fileWrite;
         try {
-            fileWrite = new FileWriter(file);
+            fileWrite = new FileWriter(file,writeMode);  // writeMode ==> true=append , false=Overide
             fileWrite.write(data);
             fileWrite.close();
         } catch (IOException e) {
@@ -167,7 +156,7 @@ public class FileIO {
         }
         return true;
     }
-//List<Integer> list
+
 
     boolean bufferWriter(String fileName, List<String> data) {
 
