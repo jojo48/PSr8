@@ -29,6 +29,8 @@ public class PGW2TXT {
     public static int sumDataDownlink_record = 0;
     public static double sumDataUplink_allFile=0;
     public static double sumDataDownlink_allFile=0;
+    public static double sumRecord_allFile=0;
+    public static double sumRecordError_allFile=0;
 
     public void DataUplink(int dataUplink) {
         sumDataUplink_allFile=sumDataUplink_allFile+dataUplink;
@@ -527,6 +529,12 @@ FileIO.FileWriter(writeLogFileName,true,"\r\n"+"================================
 //                }
 
 //----------------- End of File Summarry Report -------------------  
+        sumRecord_allFile=sumRecord_allFile+(recordCount - 1);
+        sumRecordError_allFile=sumRecordError_allFile+recordErrorCount;
+        
+        
+        
+        
         if (recordErrorList.length() > 0) {
             recordErrorList = " {[Record:"+recordErrorList.substring(0, (recordErrorList.length() - 1))+"],";
         }
@@ -627,7 +635,7 @@ FileIO.FileWriter(writeLogFileName,true,"\r\n"+"================================
        
          
          if (rawFileErrorCount > 0) {
-            rawFileErrorList = " {FileSequenceNumber:" + rawFileErrorList.substring(0, (rawFileErrorList.length() - 1)) + "}";
+            rawFileErrorList = " {SeqNo:" + rawFileErrorList.substring(0, (rawFileErrorList.length() - 1)) + "}";
         }
         FileIO.FileWriter(writeLogFileName,true,"\r\n"+"\r\n============================================== Decode Summary =============================================="+"\r\n");
 //FileIO.FileWriter(writeLogFileName,true,"sumDataUplink_allFile: "+DecimalFormat.format(sumDataUplink_allFile)+" Bytes"+"\r\n");
@@ -638,6 +646,10 @@ FileIO.FileWriter(writeLogFileName,true,"\r\n"+"================================
         FileIO.FileWriter(writeLogFileName,true,"List of Error File:\r\n");
         FileIO.FileWriter(writeLogFileName,true,listRawFileError);
         
+        
+        FileIO.FileWriter(writeLogFileName,true,"Total Record: " + DecimalFormat.format(sumRecord_allFile) + " ;  Total Record Error: " 
+                + DecimalFormat.format(sumRecordError_allFile)+"\r\n");
+        
         FileIO.FileWriter(writeLogFileName,true,"SumDataVolumeUplink: " + DecimalFormat.format(sumDataUplink_file) + " ;  SumDataVolumeDownlink: " 
                 + DecimalFormat.format(sumDataDownlink_file)+"\r\n");
         
@@ -646,8 +658,27 @@ FileIO.FileWriter(writeLogFileName,true,"\r\n"+"================================
                 +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+" ======================================"+"\r\n");
        
        
-       sumDataUplink_allFile=0;
+        System.out.print("\r\n"+"\r\n============================================== Decode Summary =============================================="+"\r\n");
+        System.out.print("Total File:" + DecimalFormat.format(totalRawFile) + " ;  File Error:" + DecimalFormat.format(rawFileErrorCount) 
+                +rawFileErrorList+"\r\n");
+        System.out.print("List of Error File:\r\n");
+        System.out.print(listRawFileError);
+        System.out.print("Total Record: " + DecimalFormat.format(sumRecord_allFile) + " ;  Total Record Error: " 
+                + DecimalFormat.format(sumRecordError_allFile)+"\r\n");
+        System.out.print("SumDataVolumeUplink: " + DecimalFormat.format(sumDataUplink_file) + " ;  SumDataVolumeDownlink: " 
+                + DecimalFormat.format(sumDataDownlink_file)+"\r\n");
+        System.out.print("\r\n"+"====================================== Decode End "
+                +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+" ======================================"+"\r\n");
+        
+        
+        
+        
+        
+        
+        sumDataUplink_allFile=0;
         sumDataDownlink_allFile=0;
+        sumRecord_allFile=0;
+        sumRecordError_allFile=0;
                 
 }
 }

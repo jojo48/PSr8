@@ -8,12 +8,15 @@ package pgw;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 /**
  *
@@ -32,7 +35,6 @@ public class FileIO {
             System.out.println("Directory " + directoryName + " is exists");    //Debug
         }
     }
-
 
     public List<String> ListFileByExtension(String folder, String ext) {
 
@@ -141,13 +143,11 @@ public class FileIO {
         return config;
     }
 
-
-
-    boolean FileWriter(String fileName,boolean writeMode, String data) {
+    boolean FileWriter(String fileName, boolean writeMode, String data) {
         File file = new File(fileName);
         FileWriter fileWrite;
         try {
-            fileWrite = new FileWriter(file,writeMode);  // writeMode ==> true=append , false=Overide
+            fileWrite = new FileWriter(file, writeMode);  // writeMode ==> true=append , false=Overide
             fileWrite.write(data);
             fileWrite.close();
         } catch (IOException e) {
@@ -156,7 +156,6 @@ public class FileIO {
         }
         return true;
     }
-
 
     boolean bufferWriter(String fileName, List<String> data) {
 
@@ -176,5 +175,25 @@ public class FileIO {
             return false;
         }
         return true;
+    }
+//}
+
+    public boolean gZIP(String sourceFile, String destFile) {
+        byte[] buffer = new byte[1024];
+
+        try {
+            try (GZIPOutputStream gzos = new GZIPOutputStream(new FileOutputStream(destFile))) {
+                try (FileInputStream in = new FileInputStream(sourceFile)) {
+                    int len;
+                    while ((len = in.read(buffer)) > 0) {
+                        gzos.write(buffer, 0, len);
+                    }
+                }
+                gzos.finish();
+            }
+            return true;    // zip file and write complete
+        } catch (IOException ex) {
+        }
+        return false;       // zip file or write error
     }
 }

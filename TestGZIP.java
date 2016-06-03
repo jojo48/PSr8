@@ -65,15 +65,22 @@ import java.util.zip.GZIPOutputStream;
 
 //-------------------------------------------------------------------------------------------------------------
 public class TestGZIP {
-    private static final String OUTPUT_GZIP_FILE = "D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\testRaw\\TestGzip\\20140403221949_sample_fieldErr.cdr.gz";
+    private static final String OUTPUT_GZIP_FILE = "D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\testRaw\\TestGzip\\20140403221949_sample_fieldErr_1.cdr.gz";
     private static final String SOURCE_FILE = "D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\testRaw\\20140403221949_sample_fieldErr.cdr";
  
     /**
      * @param args
      */
     public static void main(String[] args) {
-        TestGZIP gZip = new TestGZIP();
-        gZip.gzipIt();
+        FileIO FileIO = new FileIO();
+        if(FileIO.gZIP(SOURCE_FILE, OUTPUT_GZIP_FILE)){
+            System.out.println("gZIP Complete");
+        }else{
+            System.out.println("gZIP Error");
+        }
+        
+//        TestGZIP gZip = new TestGZIP();
+//        gZip.gzipIt();
     }
  
     /**
