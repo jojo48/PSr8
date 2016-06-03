@@ -100,12 +100,12 @@ int pathConfig_indxStart;
             offsetStart = 1;                                        // Skip "|"
         } while (pathConfig_indxEnd + 1 < pathConfig.length());
         
-        String pathRawData=listPathConfig.get("pathRawData");
-        String pathDecodeData =listPathConfig.get("pathDecodeData");
-        String pathZipData =listPathConfig.get("pathZipData");
-        String pathLogData =listPathConfig.get("pathLogData");
-        String pathFileError =listPathConfig.get("pathFileError");
-        String rawFileExtension =listPathConfig.get("rawFileExtension");
+        String pathRawData=listPathConfig.get("RawFile");
+        String pathDecodeData =listPathConfig.get("DecodeFile");
+        String pathZipData =listPathConfig.get("BackupRawFile");
+        String pathLogData =listPathConfig.get("LogFile");
+        String pathFileError =listPathConfig.get("BackupErrorFile");
+        String rawFileExtension =listPathConfig.get("RawFileExtension");
         
         
         
@@ -128,12 +128,12 @@ int pathConfig_indxStart;
 FileIO.FileWriter(writeLogFileName,true,"\r\n"+"====================================== Start Time "
                 +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+" ======================================"+"\r\n");        
  FileIO.FileWriter(writeLogFileName,true,"\r\n------------------------------------ Path Configuration ------------------------------------"+"\r\n");
- FileIO.FileWriter(writeLogFileName,true,"pathRawData:      "+pathRawData+"\r\n");
- FileIO.FileWriter(writeLogFileName,true,"pathDecodeData:   "+pathDecodeData+"\r\n");
- FileIO.FileWriter(writeLogFileName,true,"pathZipData:      "+pathZipData+"\r\n");
- FileIO.FileWriter(writeLogFileName,true,"pathLogData:      "+pathLogData+"\r\n");
- FileIO.FileWriter(writeLogFileName,true,"pathFileError:    "+pathFileError+"\r\n");
- FileIO.FileWriter(writeLogFileName,true,"rawFileExtension: "+rawFileExtension+"\r\n");
+ FileIO.FileWriter(writeLogFileName,true,"PathRawFile:         = "+pathRawData+"\r\n");
+ FileIO.FileWriter(writeLogFileName,true,"PathDecodeFile:      = "+pathDecodeData+"\r\n");
+ FileIO.FileWriter(writeLogFileName,true,"PathBackupRawFile:   = "+pathZipData+"\r\n");
+ FileIO.FileWriter(writeLogFileName,true,"PathLogFile:         = "+pathLogData+"\r\n");
+ FileIO.FileWriter(writeLogFileName,true,"PathBackupErrorFile: = "+pathFileError+"\r\n");
+ FileIO.FileWriter(writeLogFileName,true,"RawFileExtension:    = "+"\""+rawFileExtension+"\""+"\r\n");
  
 // 
 // 
@@ -215,7 +215,7 @@ FileIO.FileWriter(writeLogFileName,true,"\r\n"+"================================
         
 //        arrayLogData.add("------------------------------------ ("+DecimalFormat.format((rawFileNo+1))+"/"+DecimalFormat.format(totalRawFile)+") "+ fileName+" ------------------------------------");
 //        arrayLogData.add("TimeBegin "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        FileIO.FileWriter(writeLogFileName,true,"\r\n"+"------------------------------------ ("+DecimalFormat.format((rawFileNo+1))+"/"+DecimalFormat.format(totalRawFile)+") "
+        FileIO.FileWriter(writeLogFileName,true,"\r\n"+"------------------------------------ (SeqNo:"+DecimalFormat.format((rawFileNo+1))+"/"+DecimalFormat.format(totalRawFile)+") "
                 + fileName+" ------------------------------------"+"\r\n");
         FileIO.FileWriter(writeLogFileName,true,"Start Time "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))+"\r\n");      // Start of log file
         
@@ -551,7 +551,7 @@ FileIO.FileWriter(writeLogFileName,true,"\r\n"+"================================
         if(recordErrorCount>0){                                 // if have record error increment file error counter
         rawFileErrorList=rawFileErrorList+(rawFileNo+1)+",";
         rawFileErrorCount++;
-        listRawFileError=listRawFileError+DecimalFormat.format(rawFileErrorCount)+". ("+DecimalFormat.format((rawFileNo+1))+") "+fileName+"\r\n";
+        listRawFileError=listRawFileError+DecimalFormat.format(rawFileErrorCount)+". (SeqNo:"+DecimalFormat.format((rawFileNo+1))+") "+fileName+"\r\n";
         }
         
         
