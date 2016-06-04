@@ -23,6 +23,8 @@ import java.util.Locale;
  */
 public class PGW2TXT {
 
+    public static final String lineSeparator = System.getProperty("line.separator");
+    public static final String pathSeparator = File.separator;
     public static int sumDataUplink_file = 0;
     public static int sumDataDownlink_file = 0;
     public static int sumDataUplink_record = 0;
@@ -124,18 +126,18 @@ int pathConfig_indxStart;
 // ArrayList<String> arrayLogData = new ArrayList<>();         //array for store log data before write to text file 
         
         
-// FileIO.FileWriter(writeLogFileName,true,"##########################################################################################################################"+"\r\n");
-// FileIO.FileWriter(writeLogFileName,true,"Start Time "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))+"\r\n");      // Start of log file
+// FileIO.FileWriter(writeLogFileName,true,"##########################################################################################################################"+lineSeparator);
+// FileIO.FileWriter(writeLogFileName,true,"Start Time "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))+lineSeparator);      // Start of log file
         
-FileIO.FileWriter(writeLogFileName,true,"\r\n"+"====================================== Start Time "
-                +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+" ======================================"+"\r\n");        
- FileIO.FileWriter(writeLogFileName,true,"\r\n------------------------------------ Path Configuration ------------------------------------"+"\r\n");
- FileIO.FileWriter(writeLogFileName,true,"PathRawFile:         = "+pathRawData+"\r\n");
- FileIO.FileWriter(writeLogFileName,true,"PathDecodeFile:      = "+pathDecodeData+"\r\n");
- FileIO.FileWriter(writeLogFileName,true,"PathBackupRawFile:   = "+pathZipData+"\r\n");
- FileIO.FileWriter(writeLogFileName,true,"PathLogFile:         = "+pathLogData+"\r\n");
- FileIO.FileWriter(writeLogFileName,true,"PathBackupErrorFile: = "+pathFileError+"\r\n");
- FileIO.FileWriter(writeLogFileName,true,"RawFileExtension:    = "+"\""+rawFileExtension+"\""+"\r\n");
+FileIO.FileWriter(writeLogFileName,true,lineSeparator+"====================================== Start Time "
+                +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+" ======================================"+lineSeparator);        
+ FileIO.FileWriter(writeLogFileName,true,"\r\n------------------------------------ Path Configuration ------------------------------------"+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"PathRawFile:         = "+pathRawData+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"PathDecodeFile:      = "+pathDecodeData+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"PathBackupRawFile:   = "+pathZipData+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"PathLogFile:         = "+pathLogData+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"PathBackupErrorFile: = "+pathFileError+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"RawFileExtension:    = "+"\""+rawFileExtension+"\""+lineSeparator);
  
 // 
 // 
@@ -217,9 +219,9 @@ FileIO.FileWriter(writeLogFileName,true,"\r\n"+"================================
         
 //        arrayLogData.add("------------------------------------ ("+DecimalFormat.format((rawFileNo+1))+"/"+DecimalFormat.format(totalRawFile)+") "+ fileName+" ------------------------------------");
 //        arrayLogData.add("TimeBegin "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        FileIO.FileWriter(writeLogFileName,true,"\r\n"+"------------------------------------ (SeqNo:"+DecimalFormat.format((rawFileNo+1))+"/"+DecimalFormat.format(totalRawFile)+") "
-                + fileName+" ------------------------------------"+"\r\n");
-        FileIO.FileWriter(writeLogFileName,true,"Start Time "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))+"\r\n");      // Start of log file
+        FileIO.FileWriter(writeLogFileName,true,lineSeparator+"------------------------------------ (SeqNo:"+DecimalFormat.format((rawFileNo+1))+"/"+DecimalFormat.format(totalRawFile)+") "
+                + fileName+" ------------------------------------"+lineSeparator);
+        FileIO.FileWriter(writeLogFileName,true,"Start Time "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))+lineSeparator);      // Start of log file
         
         
         RawFile readFile = new RawFile(); // Create Object from class readRaw
@@ -238,9 +240,9 @@ FileIO.FileWriter(writeLogFileName,true,"\r\n"+"================================
         int fileLength = rawFileInt.length;
         
 //        arrayLogData.add("FileSize "+DecimalFormat.format(fileLength)+" Byte");
-        FileIO.FileWriter(writeLogFileName,true,"FileSize "+DecimalFormat.format(fileLength)+" Byte"+"\r\n");
+        FileIO.FileWriter(writeLogFileName,true,"FileSize "+DecimalFormat.format(fileLength)+" Bytes"+lineSeparator);
         
-        System.out.println("File length = " + fileLength + "|0x" + String.format("%02X", fileLength) + " Byte"); // Debug
+        System.out.println("File length = " + fileLength + "|0x" + String.format("%02X", fileLength) + " Bytes"); // Debug
         
         FieldDecoder decode = new FieldDecoder();       // Create Object from class FieldDecoder
         RawFile getRaw = new RawFile();                 // Create Object from class RawFile
@@ -250,6 +252,8 @@ FileIO.FileWriter(writeLogFileName,true,"\r\n"+"================================
         do {
             record_decode_data = "";    // Reset Recodr data buffer
             String field_hex_str = "";  // Reset old record length
+            sumDataUplink_file = 0;     // Reset Counter
+            sumDataDownlink_file = 0;   // Reset Counter
             HashMap<String,String> mapFieldData = new HashMap<>();  //Create HashMap for store field data decoded
 //            mapFieldData = new HashMap<>();
              
@@ -449,8 +453,8 @@ FileIO.FileWriter(writeLogFileName,true,"\r\n"+"================================
 //                                    addressErrorList=addressErrorList+"0x" + String.format("%02X", fileIndex)+",";
                                     
                                     
-//                                    FileIO.FileWriter(writeLogFileName,true,"Unknow Tag!!! address: " + "0x" + String.format("%02X", fileIndex)+"\r\n");
-//                                    FileIO.FileWriter(writeLogFileName,true,"Raw data remaining in process: " + (record_length-record_indx) + " Bytes"+"\r\n");
+//                                    FileIO.FileWriter(writeLogFileName,true,"Unknow Tag!!! address: " + "0x" + String.format("%02X", fileIndex)+lineSeparator);
+//                                    FileIO.FileWriter(writeLogFileName,true,"Raw data remaining in process: " + (record_length-record_indx) + " Bytes"+lineSeparator);
                                     
 //                                break;  // Break or Return
 //*************  Skip to next Record and count error **********
@@ -480,6 +484,10 @@ FileIO.FileWriter(writeLogFileName,true,"\r\n"+"================================
 
             } else {
                 System.out.println("fileIndex:0x" + String.format("%02X", fileIndex) + " record_indx:0x" + String.format("%02X", record_indx) + " Not PGW-Record");
+                FileIO.FileWriter(writeLogFileName,true,"*** Error *** ==> fileIndex:0x" + String.format("%02X", fileIndex) + " record_indx:0x" + String.format("%02X", record_indx) 
+                        + " Not PGW-Record"+lineSeparator);
+                recordErrorCount++;
+                fileIndex++;    //Check next byte
             }
             recordCount++;
             
@@ -491,11 +499,11 @@ FileIO.FileWriter(writeLogFileName,true,"\r\n"+"================================
             
 //            mapFieldData
             
-            Iterator<String> Vmap = mapFieldData.keySet().iterator();
-            while(Vmap.hasNext()){
-			String key = (String)(Vmap.next());  // Key
-			String val = mapFieldData.get(key); // Value
-			System.out.println(key + " = " + val); 
+            Iterator<String> Vmap = mapFieldData.keySet().iterator();       // Debug print (Tag) = (DecodeData)
+            while(Vmap.hasNext()){                                          // Debug print (Tag) = (DecodeData)
+			String key = (String)(Vmap.next());  // Key         // Debug print (Tag) = (DecodeData)
+			String val = mapFieldData.get(key); // Value        // Debug print (Tag) = (DecodeData)
+			System.out.println(key + " = " + val);              // Debug print (Tag) = (DecodeData)
 		}
             
 //		mapFieldData.clear();
@@ -545,21 +553,25 @@ FileIO.FileWriter(writeLogFileName,true,"\r\n"+"================================
         
         System.out.println("");
         System.out.println("***************************************** End of file *****************************************");
-        System.out.println("Record Total:" + (recordCount - 1) + " ;  Records Error:" + recordErrorCount + "{["+recordErrorList+"]" +"["+addressErrorList+"]}");
+//        System.out.println("Record Total:" + (recordCount - 1) + " ;  Records Error:" + recordErrorCount + "{["+recordErrorList+"]" +"["+addressErrorList+"]}");
+        System.out.println("Record Total:" + DecimalFormat.format(recordCount - 1) + " ;  Records Error:" + DecimalFormat.format(recordErrorCount) 
+                +recordErrorList +addressErrorList);
+        
+        
         System.out.println("Raw Data Remaining(can't process):" + (fileLength - (fileIndex + 1)) + " Byte");
         System.out.println("SumDataVolumeUplink: " + sumDataUplink_file + " ;  SumDataVolumeDownlink: " + sumDataDownlink_file);
 
         FileIO.FileWriter(writeLogFileName,true,"Record Total:" + DecimalFormat.format(recordCount - 1) + " ;  Records Error:" + DecimalFormat.format(recordErrorCount) 
-                +recordErrorList +addressErrorList+ "\r\n" 
-                + "Raw Data Remaining(can't process):" + DecimalFormat.format(fileLength - (fileIndex + 1)) + " Bytes"+"\r\n");
+                +recordErrorList +addressErrorList+ lineSeparator 
+                + "Raw Data Remaining(can't process):" + DecimalFormat.format(fileLength - (fileIndex + 1)) + " Bytes"+lineSeparator);
        
         FileIO.FileWriter(writeLogFileName,true,"SumDataVolumeUplink: " + DecimalFormat.format(sumDataUplink_file) 
-                + " ;  SumDataVolumeDownlink: " + DecimalFormat.format(sumDataDownlink_file)+"\r\n");
+                + " ;  SumDataVolumeDownlink: " + DecimalFormat.format(sumDataDownlink_file)+lineSeparator);
         
         if(recordErrorCount>0){                                 // if have record error increment file error counter
         rawFileErrorList=rawFileErrorList+(rawFileNo+1)+",";
         rawFileErrorCount++;
-        listRawFileError=listRawFileError+DecimalFormat.format(rawFileErrorCount)+". (SeqNo:"+DecimalFormat.format((rawFileNo+1))+") "+fileName+"\r\n";
+        listRawFileError=listRawFileError+DecimalFormat.format(rawFileErrorCount)+". (SeqNo:"+DecimalFormat.format((rawFileNo+1))+") "+fileName+lineSeparator;
         }
         
         
@@ -637,41 +649,41 @@ FileIO.FileWriter(writeLogFileName,true,"\r\n"+"================================
          if (rawFileErrorCount > 0) {
             rawFileErrorList = " {SeqNo:" + rawFileErrorList.substring(0, (rawFileErrorList.length() - 1)) + "}";
         }
-        FileIO.FileWriter(writeLogFileName,true,"\r\n"+"\r\n============================================== Decode Summary =============================================="+"\r\n");
-//FileIO.FileWriter(writeLogFileName,true,"sumDataUplink_allFile: "+DecimalFormat.format(sumDataUplink_allFile)+" Bytes"+"\r\n");
+        FileIO.FileWriter(writeLogFileName,true,lineSeparator+"\r\n============================================== Decode Summary =============================================="+lineSeparator);
+//FileIO.FileWriter(writeLogFileName,true,"sumDataUplink_allFile: "+DecimalFormat.format(sumDataUplink_allFile)+" Bytes"+lineSeparator);
         
         
         FileIO.FileWriter(writeLogFileName,true,"Total File: " + DecimalFormat.format(totalRawFile) + " ;  File Error:" + DecimalFormat.format(rawFileErrorCount) 
-                +rawFileErrorList+"\r\n");
+                +rawFileErrorList+lineSeparator);
         FileIO.FileWriter(writeLogFileName,true,"List of Error File:\r\n");
         FileIO.FileWriter(writeLogFileName,true,listRawFileError);
         
         
         FileIO.FileWriter(writeLogFileName,true,"Total Record: " + DecimalFormat.format(sumRecord_allFile) + " ;  Total Record Error: " 
-                + DecimalFormat.format(sumRecordError_allFile)+"\r\n");
+                + DecimalFormat.format(sumRecordError_allFile)+lineSeparator);
         
-        FileIO.FileWriter(writeLogFileName,true,"SumDataVolumeUplink: " + DecimalFormat.format(sumDataUplink_file) + " ;  SumDataVolumeDownlink: " 
-                + DecimalFormat.format(sumDataDownlink_file)+"\r\n");
+        FileIO.FileWriter(writeLogFileName,true,"Total DataVolumeUplink: " + DecimalFormat.format(sumDataUplink_allFile) + " ;  Total DataVolumeDownlink: " 
+                + DecimalFormat.format(sumDataDownlink_allFile)+lineSeparator);
         
-//        FileIO.FileWriter(writeLogFileName,true,"Finish Time "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))+"\r\n");      // Start of log file
-        FileIO.FileWriter(writeLogFileName,true,"\r\n"+"====================================== Decode End "
-                +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+" ======================================"+"\r\n");
+//        FileIO.FileWriter(writeLogFileName,true,"Finish Time "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))+lineSeparator);      // Start of log file
+        FileIO.FileWriter(writeLogFileName,true,lineSeparator+"====================================== Decode End "
+                +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+" ======================================"+lineSeparator);
        
        
-        System.out.print("\r\n"+"\r\n============================================== Decode Summary =============================================="+"\r\n");
+        System.out.print(lineSeparator+"\r\n============================================== Decode Summary =============================================="+lineSeparator);
         System.out.print("Total File:" + DecimalFormat.format(totalRawFile) + " ;  File Error:" + DecimalFormat.format(rawFileErrorCount) 
-                +rawFileErrorList+"\r\n");
+                +rawFileErrorList+lineSeparator);
         System.out.print("List of Error File:\r\n");
         System.out.print(listRawFileError);
         System.out.print("Total Record: " + DecimalFormat.format(sumRecord_allFile) + " ;  Total Record Error: " 
-                + DecimalFormat.format(sumRecordError_allFile)+"\r\n");
-        System.out.print("SumDataVolumeUplink: " + DecimalFormat.format(sumDataUplink_file) + " ;  SumDataVolumeDownlink: " 
-                + DecimalFormat.format(sumDataDownlink_file)+"\r\n");
-        System.out.print("\r\n"+"====================================== Decode End "
-                +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+" ======================================"+"\r\n");
+                + DecimalFormat.format(sumRecordError_allFile)+lineSeparator);
+        System.out.print("Total DataVolumeUplink: " + DecimalFormat.format(sumDataUplink_allFile) + " ;  Total DataVolumeDownlink: " 
+                + DecimalFormat.format(sumDataDownlink_allFile)+lineSeparator);
+        System.out.print(lineSeparator+"====================================== Decode End "
+                +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+" ======================================"+lineSeparator);
         
         
-        
+       
         
         
         
