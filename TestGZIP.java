@@ -73,7 +73,7 @@ public class TestGZIP {
      */
     public static void main(String[] args) {
         FileIO FileIO = new FileIO();
-        if(FileIO.gZIP(SOURCE_FILE, OUTPUT_GZIP_FILE)){
+        if(FileIO.gZIP(SOURCE_FILE, OUTPUT_GZIP_FILE)){     //Test with create object from class FileIO
             System.out.println("gZIP Complete");
         }else{
             System.out.println("gZIP Error");

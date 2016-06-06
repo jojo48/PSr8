@@ -106,9 +106,9 @@ int pathConfig_indxStart;
         
         String pathRawData=listPathConfig.get("RawFile");
         String pathDecodeData =listPathConfig.get("DecodeFile");
-        String pathZipData =listPathConfig.get("BackupRawFile");
+        String pathBackupRawFile =listPathConfig.get("BackupRawFile");
         String pathLogData =listPathConfig.get("LogFile");
-        String pathFileError =listPathConfig.get("BackupErrorFile");
+        String pathBackupRawFileError =listPathConfig.get("BackupRawFileError");
         String rawFileExtension =listPathConfig.get("RawFileExtension");
         
         
@@ -116,9 +116,9 @@ int pathConfig_indxStart;
 //        String timeStamp = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new Date());
         
         FileIO.createDirectory(pathDecodeData);
-        FileIO.createDirectory(pathZipData);
+        FileIO.createDirectory(pathBackupRawFile);
         FileIO.createDirectory(pathLogData);
-        FileIO.createDirectory(pathFileError);
+        FileIO.createDirectory(pathBackupRawFileError);
         
         List<String> arrayListFile=FileIO.ListFileByExtension(pathRawData, rawFileExtension);   // List RAW File from folder pathRawData
         String writeLogFileName = pathLogData+"LogDecoder.txt";
@@ -134,9 +134,9 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
  FileIO.FileWriter(writeLogFileName,true,"\r\n------------------------------------ Path Configuration ------------------------------------"+lineSeparator);
  FileIO.FileWriter(writeLogFileName,true,"PathRawFile:         = "+pathRawData+lineSeparator);
  FileIO.FileWriter(writeLogFileName,true,"PathDecodeFile:      = "+pathDecodeData+lineSeparator);
- FileIO.FileWriter(writeLogFileName,true,"PathBackupRawFile:   = "+pathZipData+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"PathBackupRawFile:   = "+pathBackupRawFile+lineSeparator);
  FileIO.FileWriter(writeLogFileName,true,"PathLogFile:         = "+pathLogData+lineSeparator);
- FileIO.FileWriter(writeLogFileName,true,"PathBackupErrorFile: = "+pathFileError+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"PathBackupErrorFile: = "+pathBackupRawFileError+lineSeparator);
  FileIO.FileWriter(writeLogFileName,true,"RawFileExtension:    = "+"\""+rawFileExtension+"\""+lineSeparator);
  
 // 
@@ -176,6 +176,7 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
        int errCountLimit=3;
        String listRawFileError="";
        String rawFileErrorList="";
+       String backupRawDestination="";
        
        for(int rawFileNo=0;rawFileNo<totalRawFile;rawFileNo++){
            String fileName=arrayListFile.get(rawFileNo);
@@ -588,6 +589,9 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
         rawFileErrorList=rawFileErrorList+(rawFileNo+1)+",";
         rawFileErrorCount++;
         listRawFileError=listRawFileError+DecimalFormat.format(rawFileErrorCount)+". (SeqNo:"+DecimalFormat.format((rawFileNo+1))+") "+fileName+lineSeparator;
+        backupRawDestination=pathBackupRawFileError+fileName+".gz";     // Save Backup RAW File To == > PathBackupRawFileError
+        }else{
+            backupRawDestination=pathBackupRawFile+fileName+".gz";     // Save Backup RAW File To == > PathBackupRawFile
         }
         
         
@@ -608,7 +612,7 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
          if (pathTextData.exists()) {
              FileIO.bufferWriter(writeFileName,arrayRecordData);     // Write output to text file
         } else {
-            System.out.println("Directory " + pathDecodeData + " is not exists !!!");
+            System.out.println("Directory " + pathDecodeData + " Not exists !!!");
         }
         
         File textData = new File(writeFileName);
@@ -616,9 +620,31 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
              System.out.println("Decode File: "+fileName+" FileSize "+DecimalFormat.format(fileLength)+" Bytes ==> "+DecimalFormat.format((recordCount-1))+"/"+DecimalFormat.format(recordErrorCount)+" Records(Total/Error)");
 
         } else {
-            System.out.println("Directory " + pathDecodeData + " is not exists !!!");
+            System.out.println("Directory " + pathDecodeData + " Not exists !!!");
         }
         
+         
+         
+         
+         if(FileIO.gZIP(rawFilePathName, backupRawDestination)){     //Test with create object from class FileIO
+            System.out.println("gZIP Complete");
+        }else{
+            System.out.println("gZIP Error");
+        }
+         
+         
+//         
+//         File pathBackupRaw = new File(backupRawDestination);
+//         if (pathBackupRaw.exists()) {
+//             FileIO.bufferWriter(writeFileName,arrayRecordData);     // Write output to text file
+//        } else {
+//            System.out.println("Directory " + pathDecodeData + " Not exists !!!");
+//        }
+         
+         
+         
+         
+         
 //        FileIO.bufferWriter(writeFileName,arrayRecordData);     // Write output to text file
         
          
