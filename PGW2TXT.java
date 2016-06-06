@@ -173,12 +173,15 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
 //     
        int totalRawFile= arrayListFile.size();
        int rawFileErrorCount=0;
+       int errCountLimit=3;
        String listRawFileError="";
        String rawFileErrorList="";
+       
        for(int rawFileNo=0;rawFileNo<totalRawFile;rawFileNo++){
            String fileName=arrayListFile.get(rawFileNo);
            String rawFilePathName=pathRawData+fileName;
-           
+           int notPGWCount=0;       // Counter for Count Not PGW Record If Over Limit Skip To Next Raw File
+                      
            
            System.out.println("=================================================================================");     // Debug
            System.out.println("Decoding file: "+rawFilePathName);                                                           // Debug
@@ -238,6 +241,7 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
 //           ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\20140920201238_sample_x30x80.cdr");
 //           ("D:\\Training\\Java\\SourceCode\\cdr\\cdr_raw_PS_R8\\b00000001.dat");
         int fileLength = rawFileInt.length;
+//        int rawFileRemain=fileLength;
         
 //        arrayLogData.add("FileSize "+DecimalFormat.format(fileLength)+" Byte");
         FileIO.FileWriter(writeLogFileName,true,"FileSize "+DecimalFormat.format(fileLength)+" Bytes"+lineSeparator);
@@ -261,6 +265,7 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
 //---------------- Start of loop record process ------------------------
             String record_type_hex_str = String.format("%02X", rawFileInt[fileIndex]) + String.format("%02X", rawFileInt[fileIndex + 1]);
             if ("BF4F".equals(record_type_hex_str)) {
+                notPGWCount=0;          // Reset Record Error Counter
                 fileIndex = fileIndex + 2;
                 sumRecordLength = sumRecordLength + 2;
                 System.out.println("############################## Record: " + recordCount + " ##############################");
@@ -483,11 +488,21 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
                 }
 
             } else {
+                if(notPGWCount<errCountLimit){      // Set Limit of Record Error Count = 5
                 System.out.println("fileIndex:0x" + String.format("%02X", fileIndex) + " record_indx:0x" + String.format("%02X", record_indx) + " Not PGW-Record");
                 FileIO.FileWriter(writeLogFileName,true,"*** Error *** ==> fileIndex:0x" + String.format("%02X", fileIndex) + " record_indx:0x" + String.format("%02X", record_indx) 
                         + " Not PGW-Record"+lineSeparator);
                 recordErrorCount++;
+                notPGWCount++;
                 fileIndex++;    //Check next byte
+                }else{
+                    System.out.println("Skip File \""+fileName+"\" Because Record Error Count is Over Limit(>"+errCountLimit+")");
+                    FileIO.FileWriter(writeLogFileName,true,"Skip File \""+fileName+"\" Because Record Error Count is Over Limit(>"+notPGWCount+") and RAW Data Remaining:"
+                            +((fileLength)-fileIndex)+" Bytes"+lineSeparator);
+//                    rawFileRemain=(fileLength-1)-fileIndex;
+                    fileIndex=fileLength-1;       // Set fileIndex For Skip This File
+                    recordErrorCount=recordErrorCount -errCountLimit;
+                }
             }
             recordCount++;
             
@@ -532,6 +547,7 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
             sumDataDownlink_record = 0;     //Reset value
              
         } while ((fileIndex + 1) < fileLength);     // +1Byet for adjust length (protect array out of bound)
+//        rawFileRemain=(fileLength-1)-fileIndex;
 //        catch(Exception ex){
 //                
 //                }
@@ -558,17 +574,17 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
                 +recordErrorList +addressErrorList);
         
         
-        System.out.println("Raw Data Remaining(can't process):" + (fileLength - (fileIndex + 1)) + " Byte");
+        System.out.println("Raw Data Remaining(can't process):" + ((fileLength-1)-fileIndex) + " Byte");
         System.out.println("SumDataVolumeUplink: " + sumDataUplink_file + " ;  SumDataVolumeDownlink: " + sumDataDownlink_file);
 
         FileIO.FileWriter(writeLogFileName,true,"Record Total:" + DecimalFormat.format(recordCount - 1) + " ;  Records Error:" + DecimalFormat.format(recordErrorCount) 
                 +recordErrorList +addressErrorList+ lineSeparator 
-                + "Raw Data Remaining(can't process):" + DecimalFormat.format(fileLength - (fileIndex + 1)) + " Bytes"+lineSeparator);
+                + "Raw Data Remaining(can't process):" + DecimalFormat.format((fileLength-1)-fileIndex) + " Bytes"+lineSeparator);
        
         FileIO.FileWriter(writeLogFileName,true,"SumDataVolumeUplink: " + DecimalFormat.format(sumDataUplink_file) 
                 + " ;  SumDataVolumeDownlink: " + DecimalFormat.format(sumDataDownlink_file)+lineSeparator);
         
-        if(recordErrorCount>0){                                 // if have record error increment file error counter
+        if(recordErrorCount>0|notPGWCount>0){                                 // if have record error increment file error counter
         rawFileErrorList=rawFileErrorList+(rawFileNo+1)+",";
         rawFileErrorCount++;
         listRawFileError=listRawFileError+DecimalFormat.format(rawFileErrorCount)+". (SeqNo:"+DecimalFormat.format((rawFileNo+1))+") "+fileName+lineSeparator;
@@ -660,7 +676,7 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
         
         
         FileIO.FileWriter(writeLogFileName,true,"Total Record: " + DecimalFormat.format(sumRecord_allFile) + " ;  Total Record Error: " 
-                + DecimalFormat.format(sumRecordError_allFile)+lineSeparator);
+                + DecimalFormat.format(sumRecordError_allFile)+" (Exclude File Error)"+lineSeparator);
         
         FileIO.FileWriter(writeLogFileName,true,"Total DataVolumeUplink: " + DecimalFormat.format(sumDataUplink_allFile) + " ;  Total DataVolumeDownlink: " 
                 + DecimalFormat.format(sumDataDownlink_allFile)+lineSeparator);
@@ -676,7 +692,7 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
         System.out.print("List of Error File:\r\n");
         System.out.print(listRawFileError);
         System.out.print("Total Record: " + DecimalFormat.format(sumRecord_allFile) + " ;  Total Record Error: " 
-                + DecimalFormat.format(sumRecordError_allFile)+lineSeparator);
+                + DecimalFormat.format(sumRecordError_allFile)+" (Exclude File Error)"+lineSeparator);
         System.out.print("Total DataVolumeUplink: " + DecimalFormat.format(sumDataUplink_allFile) + " ;  Total DataVolumeDownlink: " 
                 + DecimalFormat.format(sumDataDownlink_allFile)+lineSeparator);
         System.out.print(lineSeparator+"====================================== Decode End "
