@@ -115,9 +115,18 @@ int pathConfig_indxStart;
         String backupWithGzip=(listPathConfig.get("BackupWithGzip")).toUpperCase();
         String deleteOriginalRawFile=(listPathConfig.get("DeleteOriginalRawFile")).toUpperCase();
         
-        System.out.println("backupWithGzip: "+backupWithGzip);                      //Debug
-        System.out.println("deleteOriginalRawFile: "+deleteOriginalRawFile);        //Debug
-        
+ System.out.println(lineSeparator+"====================================== Start Time "
+                    +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+" ======================================");        
+ System.out.println("\r\n------------------------------------ Path Configuration ------------------------------------");
+ System.out.println("PathRawFile:          = "+pathRawData);
+ System.out.println("PathDecodeFile:       = "+pathDecodeData);
+ System.out.println("PathBackupRawFile:    = "+pathBackupRawFile);
+ System.out.println("PathLogFile:          = "+pathLogData);
+ System.out.println("PathBackupErrorFile:  = "+pathBackupRawFileError);
+ System.out.println("RawFileExtension:     = "+"\""+rawFileExtension+"\"");
+ System.out.println("CopyRawToBackup       = "+copyRawToBackup);
+ System.out.println("BackupWithGzip        = "+backupWithGzip);
+ System.out.println("DeleteOriginalRawFile = "+deleteOriginalRawFile);
         
         
         
@@ -140,12 +149,15 @@ int pathConfig_indxStart;
 FileIO.FileWriter(writeLogFileName,true,lineSeparator+"====================================== Start Time "
                 +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+" ======================================"+lineSeparator);        
  FileIO.FileWriter(writeLogFileName,true,"\r\n------------------------------------ Path Configuration ------------------------------------"+lineSeparator);
- FileIO.FileWriter(writeLogFileName,true,"PathRawFile:         = "+pathRawData+lineSeparator);
- FileIO.FileWriter(writeLogFileName,true,"PathDecodeFile:      = "+pathDecodeData+lineSeparator);
- FileIO.FileWriter(writeLogFileName,true,"PathBackupRawFile:   = "+pathBackupRawFile+lineSeparator);
- FileIO.FileWriter(writeLogFileName,true,"PathLogFile:         = "+pathLogData+lineSeparator);
- FileIO.FileWriter(writeLogFileName,true,"PathBackupErrorFile: = "+pathBackupRawFileError+lineSeparator);
- FileIO.FileWriter(writeLogFileName,true,"RawFileExtension:    = "+"\""+rawFileExtension+"\""+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"PathRawFile:          = "+pathRawData+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"PathDecodeFile:       = "+pathDecodeData+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"PathBackupRawFile:    = "+pathBackupRawFile+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"PathLogFile:          = "+pathLogData+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"PathBackupErrorFile:  = "+pathBackupRawFileError+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"RawFileExtension:     = "+"\""+rawFileExtension+"\""+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"CopyRawToBackup       = "+copyRawToBackup+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"BackupWithGzip        = "+backupWithGzip+lineSeparator);
+ FileIO.FileWriter(writeLogFileName,true,"DeleteOriginalRawFile = "+deleteOriginalRawFile+lineSeparator);
  
 // 
 // 
