@@ -99,6 +99,7 @@ public class PGW2TXT {
         System.out.println("CopyRawToBackup       = " + copyRawToBackup);
         System.out.println("BackupWithGzip        = " + backupWithGzip);
         System.out.println("DeleteOriginalRawFile = " + deleteOriginalRawFile);
+        System.out.println("RecordErrorCountLimit = " + recordErrorCountLimit);
 
         FileIO.createDirectory(pathDecodeData);
         FileIO.createDirectory(pathBackupRawFile);
@@ -120,6 +121,7 @@ public class PGW2TXT {
         FileIO.FileWriter(writeLogFileName, true, "CopyRawToBackup       = " + copyRawToBackup + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "BackupWithGzip        = " + backupWithGzip + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "DeleteOriginalRawFile = " + deleteOriginalRawFile + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "RecordErrorCountLimit = " + recordErrorCountLimit + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "Total RAW File = " + arrayListFile.size() + lineSeparator);
 
