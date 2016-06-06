@@ -631,6 +631,51 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
         }else{
             System.out.println("gZIP Error");
         }
+        }else{      //----------------- copy RAW File To Backup RAW File Path ---------------------
+            File rawFileSourcePath = new File(rawFilePathName); //("H:\\work-temp\\file");     //source
+            backupRawDestination=backupRawDestination+fileName;
+            File backupRawPath = new File(backupRawDestination);  //("H:\\work-temp\\file2");       //dest
+            try {
+                FileUtils.copyFile(rawFileSourcePath, backupRawPath);
+                } catch (IOException e) {
+        }
+        }
+         }else{     
+            //----------------- Skip Backup Original RAW File --------------------
+              }
+  
+    if(deleteOriginalRawFile.equals("YES")){    // Delete Original RAW File (Yes/No)
+        File fileToDelete = FileUtils.getFile(rawFilePathName);
+        FileUtils.deleteQuietly(fileToDelete);
+        
+////        boolean deleteSuccess = FileUtils.deleteQuietly(fileToDelete);
+//            if(FileUtils.deleteQuietly(fileToDelete)){
+////                System.out.println("Move RAW File To ==> "+backupRawDestination);   
+//            }else{
+////         System.out.println("*** Error Can't Move RAW File To ==> "+backupRawDestination);
+//        }
+           
+        
+    }
+        
+//        Test
+        
+        
+//    }
+        
+        
+        
+        
+        
+//        FileUtils.copyFile(textData, null)
+     
+        
+        
+//         deleteOriginalRawFile
+
+        
+        
+        
          
          
 //         
