@@ -29,10 +29,10 @@ public class FileIO {
 
         // if the directory does not exist, create it
         if (!theDir.exists()) {
-            System.out.println("creating directory: " + directoryName);     // Debug
+//            System.out.println("creating directory: " + directoryName);     // Debug
             theDir.mkdir();
         } else {
-            System.out.println("Directory " + directoryName + " is exists");    //Debug
+//            System.out.println("Directory " + directoryName + " is exists");    //Debug
         }
     }
 
