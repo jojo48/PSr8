@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -110,6 +111,13 @@ int pathConfig_indxStart;
         String pathLogData =listPathConfig.get("LogFile");
         String pathBackupRawFileError =listPathConfig.get("BackupRawFileError");
         String rawFileExtension =listPathConfig.get("RawFileExtension");
+        String copyRawToBackup=(listPathConfig.get("CopyRawToBackup")).toUpperCase();
+        String backupWithGzip=(listPathConfig.get("BackupWithGzip")).toUpperCase();
+        String deleteOriginalRawFile=(listPathConfig.get("DeleteOriginalRawFile")).toUpperCase();
+        
+        System.out.println("backupWithGzip: "+backupWithGzip);                      //Debug
+        System.out.println("deleteOriginalRawFile: "+deleteOriginalRawFile);        //Debug
+        
         
         
         
@@ -589,9 +597,9 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
         rawFileErrorList=rawFileErrorList+(rawFileNo+1)+",";
         rawFileErrorCount++;
         listRawFileError=listRawFileError+DecimalFormat.format(rawFileErrorCount)+". (SeqNo:"+DecimalFormat.format((rawFileNo+1))+") "+fileName+lineSeparator;
-        backupRawDestination=pathBackupRawFileError+fileName+".gz";     // Save Backup RAW File To == > PathBackupRawFileError
+        backupRawDestination=pathBackupRawFileError+fileName;     // Save Backup RAW File To == > PathBackupRawFileError
         }else{
-            backupRawDestination=pathBackupRawFile+fileName+".gz";     // Save Backup RAW File To == > PathBackupRawFile
+            backupRawDestination=pathBackupRawFile+fileName;     // Save Backup RAW File To == > PathBackupRawFile
         }
         
         
@@ -623,16 +631,64 @@ FileIO.FileWriter(writeLogFileName,true,lineSeparator+"=========================
             System.out.println("Directory " + pathDecodeData + " Not exists !!!");
         }
         
-         
-         
-         
+//------------------------------------- Backup Original RAW File --------------------------------------------     
+//   1. Select Backup (Yes/No)
+//   2. Select Type of Backup (RAW/Gzip)
+//   3. Delete Original RAW File (Yes/No)
+//-----------------------------------------------------------------------------------------------------------
+    if(copyRawToBackup.equals("YES")){      // Check Backup (Yes/No)
+        if(backupWithGzip.equals("YES")){   // Check Type of Backup (RAW/Gzip)
+         backupRawDestination=backupRawDestination+fileName+".gz";
          if(FileIO.gZIP(rawFilePathName, backupRawDestination)){     //Test with create object from class FileIO
             System.out.println("gZIP Complete");
         }else{
             System.out.println("gZIP Error");
         }
-         
-         
+        }else{      //----------------- copy RAW File To Backup RAW File Path ---------------------
+            File rawFileSourcePath = new File(rawFilePathName); //("H:\\work-temp\\file");     //source
+            backupRawDestination=backupRawDestination+fileName;
+            File backupRawPath = new File(backupRawDestination);  //("H:\\work-temp\\file2");       //dest
+            try {
+                FileUtils.copyFile(rawFileSourcePath, backupRawPath);
+                } catch (IOException e) {
+        }
+        }
+         }else{     
+            //----------------- Skip Backup Original RAW File --------------------
+              }
+  
+    if(deleteOriginalRawFile.equals("YES")){    // Delete Original RAW File (Yes/No)
+        File fileToDelete = FileUtils.getFile(rawFilePathName);
+        FileUtils.deleteQuietly(fileToDelete);
+        
+////        boolean deleteSuccess = FileUtils.deleteQuietly(fileToDelete);
+//            if(FileUtils.deleteQuietly(fileToDelete)){
+////                System.out.println("Move RAW File To ==> "+backupRawDestination);   
+//            }else{
+////         System.out.println("*** Error Can't Move RAW File To ==> "+backupRawDestination);
+//        }
+           
+        
+    }
+        
+        
+        
+        
+//    }
+        
+        
+        
+        
+        
+//        FileUtils.copyFile(textData, null)
+     
+        
+        
+//         deleteOriginalRawFile
+
+        
+        
+        
 //         
 //         File pathBackupRaw = new File(backupRawDestination);
 //         if (pathBackupRaw.exists()) {

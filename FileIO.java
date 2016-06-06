@@ -104,7 +104,7 @@ public class FileIO {
                 while ((line = bufferRead.readLine()) != null) {
                     line = line.trim();
                     if (line.length() > 1) {
-                        if ("[".equals(line.substring(0, 1))) {   //Check line start with "["
+                        if ("[".equals(line.substring(0, 1))&&("]".equals(line.substring(line.length()-1,line.length())))) {   //Check line start with "[" and end with "]"
                             tagHeader = line;
                         } else {
 
@@ -116,7 +116,7 @@ public class FileIO {
                                     tagCount++;     //Count Tag Field config
                                     break;
 
-                                case "[Path]":
+                                case "[RunConfig]":
                                     pathConfig = pathConfig + line + "|";
                                     break;
 
