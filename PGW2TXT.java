@@ -117,7 +117,7 @@ public class PGW2TXT {
         FileIO.FileWriter(writeLogFileName, true, "PathBackupRawFile:    = " + pathBackupRawFile + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "PathLogFile:          = " + pathLogData + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "PathBackupErrorFile:  = " + pathBackupRawFileError + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "RawFileExtension:     = " + rawFileExtension+ lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "RawFileExtension:     = " + rawFileExtension + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "CopyRawToBackup       = " + copyRawToBackup + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "BackupWithGzip        = " + backupWithGzip + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "DeleteOriginalRawFile = " + deleteOriginalRawFile + lineSeparator);
@@ -205,9 +205,7 @@ public class PGW2TXT {
                             tag_1hex_str = "x" + String.format("%02X", rawFileInt[fileIndex]);    // Convert Integer to Hex String for check Tag field 1Byte
 
 //----------------------------- Start of tag_1hex_str ---------------------------
-//                            System.out.println("------------------- Start of field (Record:" + recordCount + ") --------------------");     // Debug
                             if (fieldConfig.contains(tag_1hex_str + ",")) {     // Check 1Byte Tag field is in Tag list table
-//                                System.out.print("Field Tag: " + tag_1hex_str + "   Address: 0x" + String.format("%02X", fileIndex) + "  "); // Debug print
                                 fileIndex++;
                                 record_indx++;
                                 int tag_list_length = fieldConfig.indexOf("|", fieldConfig.indexOf(tag_1hex_str));
@@ -220,7 +218,7 @@ public class PGW2TXT {
                                     if (("xAC".equals(tag_1hex_str)) && (rawFileInt[fileIndex] > 0x80) && (rawFileInt[fileIndex + 2] == 0x30)) {
                                         fileIndex += 2;       //Skip 2Byte
                                         record_indx += 2;     //Skip 2Byte
-                                        // ------- Check all sub field x30 Length -------
+// ------- Check all sub field x30 Length -------
                                         int x30_indx = fileIndex;
                                         int x30_len = rawFileInt[x30_indx + 1] + 2;    //+1Byte for Skip tag x30; +2Byte(Tag+Length Byte)
 
@@ -259,7 +257,6 @@ public class PGW2TXT {
                             } else {
                                 tag_2hex_str = tag_1hex_str.substring(0, 3) + String.format("%02X", rawFileInt[fileIndex + 1]);    // Convert Integer to Hex String for check Tag field 2Byte
                                 if (fieldConfig.contains(tag_2hex_str + ",")) {     // Check 2Byte Tag field is in Tag list table
-//                                    System.out.print("Field Tag: " + tag_2hex_str + "   Address: 0x" + String.format("%02X", fileIndex) + "  "); // Debug print
                                     fileIndex += 2;
                                     record_indx += 2;
                                     int tag_list_length = fieldConfig.indexOf("|", fieldConfig.indexOf(tag_2hex_str));
@@ -321,8 +318,6 @@ public class PGW2TXT {
                             }
                             mapFieldData.put("sumDataUplink_record", Integer.toString(sumDataUplink_record));       // push to HashMapArray
                             mapFieldData.put("sumDataDownlink_record", Integer.toString(sumDataDownlink_record));   // push to HashMapArray
-
-//                            System.out.println("SumDataVolumeUplink: " + sumDataUplink_record + " ;  SumDataVolumeDownlink: " + sumDataDownlink_record);    // Debug
                         } while (fileIndex < sumRecordLength);
                     } catch (Exception ex) {
                         recordErrorCount++;
@@ -378,8 +373,6 @@ public class PGW2TXT {
             if (addressErrorList.length() > 0) {
                 addressErrorList = "[Address:" + addressErrorList.substring(0, (addressErrorList.length() - 1)) + "]}";
             }
-//            System.out.println("");     //Debug
-//            System.out.println("***************************************** End of file *****************************************");  // Debug
             System.out.println("Record Total:" + DecimalFormat.format(recordCount - 1) + " ;  Records Error:" + DecimalFormat.format(recordErrorCount)
                     + recordErrorList + addressErrorList);
             System.out.println("Raw Data Remaining(can't process):" + ((fileLength - 1) - fileIndex) + " Byte");
@@ -410,12 +403,10 @@ public class PGW2TXT {
 
             File textData = new File(writeFileName);
             if (textData.exists()) {
-//                System.out.println("Decode File: " + fileName + " FileSize " + DecimalFormat.format(fileLength) + " Bytes ==> " + DecimalFormat.format((recordCount - 1)) + "/" + DecimalFormat.format(recordErrorCount) + " Records(Total/Error)");    //Debug
-
             } else {
                 System.out.println("Directory " + pathDecodeData + " Not exists !!!");
             }
-//        
+
 //------------------------------------- Backup Original RAW File --------------------------------------------     
 //   1. Select Backup (Yes/No)
 //   2. Select Type of Backup (RAW/Gzip)
@@ -424,10 +415,10 @@ public class PGW2TXT {
             if (copyRawToBackup.equals("YES")) {      // Check Backup (Yes/No)
                 if (backupWithGzip.equals("YES")) {   // Check Type of Backup (RAW/Gzip)
                     backupRawDestination = backupRawDestination + fileName + ".gz";
-                    if (FileIO.gZIP(rawFilePathName, backupRawDestination)) {     //Test with create object from class FileIO
-                        System.out.println("gZIP Complete");
+                    if (FileIO.gZIP(rawFilePathName, backupRawDestination)) {     // Create Gzip and Check File *.gz Is Created
+//                        System.out.println("gZIP Complete");    // Debug
                     } else {
-                        System.out.println("gZIP Error");
+//                        System.out.println("gZIP Error");       // Debug
                     }
                 } else {      //----------------- copy RAW File To Backup RAW File Path ---------------------
                     File rawFileSourcePath = new File(rawFilePathName); //("H:\\work-temp\\file");     //source
