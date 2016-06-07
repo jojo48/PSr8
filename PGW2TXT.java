@@ -54,17 +54,17 @@ public class PGW2TXT {
         FileIO FileIO = new FileIO();
         String pathFileConfig = "D:\\Training\\Java\\SourceCode\\pgw\\PGWr8.csv";
         String[] readConfig = FileIO.ReadFileConfig(pathFileConfig);    //Return with array of header group
-        String pathConfig = readConfig[0];  // String of Path Configuration
-        String fieldConfig = readConfig[1]; // String of Tag Field list
-        String record_decode_data; // Recodr data buffer
+        String pathConfig = readConfig[0];                              // String of Path Configuration
+        String fieldConfig = readConfig[1];                             // String of Tag Field list
+        String record_decode_data;                                      // Recodr data buffer
 
-//#################################### Read Configuration and Store ArrayList ###############################################  
+//#################################### Read Configuration and Store to ArrayList ###############################################  
 //        
         int pathConfig_indxStart;
         int pathConfig_indxEnd = 0;
-        int offsetStart = 0;            // use for check and Skip "|"
+        int offsetStart = 0;                                            // use for check and Skip "|"
 
-        HashMap<String, String> listPathConfig = new HashMap<>();  //Create HashMap for store field data decoded
+        HashMap<String, String> listPathConfig = new HashMap<>();       //Create HashMap for store field data decoded
 
         do {
             pathConfig_indxStart = pathConfig_indxEnd + offsetStart;
@@ -72,8 +72,8 @@ public class PGW2TXT {
             String pathItem = pathConfig.substring(pathConfig_indxStart, pathConfig.indexOf("|", pathConfig_indxEnd));
             String key = pathItem.substring(0, pathItem.indexOf("="));
             String val = pathItem.substring(pathItem.indexOf("=") + 1, pathItem.length());
-            listPathConfig.put(key, val);                           // push to HashMapArray
-            offsetStart = 1;                                        // Skip "|"
+            listPathConfig.put(key, val);                               // push to HashMapArray
+            offsetStart = 1;                                            // Skip "|"
         } while (pathConfig_indxEnd + 1 < pathConfig.length());
 
         String pathRawData = listPathConfig.get("RawFile");
@@ -131,7 +131,6 @@ public class PGW2TXT {
 //     
         int totalRawFile = arrayListFile.size();
         int rawFileErrorCount = 0;
-//   hhh     int errCountLimit = 3;
         String listRawFileError = "";
         String rawFileErrorList = "";
         String backupRawDestination;
@@ -139,30 +138,17 @@ public class PGW2TXT {
         for (int rawFileNo = 0; rawFileNo < totalRawFile; rawFileNo++) {
             String fileName = arrayListFile.get(rawFileNo);
             String rawFilePathName = pathRawData + fileName;
-            int notPGWCount = 0;       // Counter for Count Not PGW Record If Over Limit Skip To Next Raw File
-
-//           
-//           System.out.println("=================================================================================");     // Debug
-//           System.out.println("Decoding file: "+rawFilePathName);                                                           // Debug
-//           System.out.println("=================================================================================");     // Debug
-//       
+            int notPGWCount = 0;                                        // Counter for Count Not PGW Record If Over Limit Skip To Next Raw File    
             ArrayList<String> arrayRecordData = new ArrayList<>();      //array for store record decode data before write to text file
             int fieldCount = Integer.parseInt(readConfig[2]);
             String[] arrayFieldList = new String[fieldCount + 2];       // array for store field list  //+2 for sumUplink, sumDownlink
-
-            int fieldConfig_len = fieldConfig.length();
-            int fieldConfig_indx = 0;
-            int tagIndex;
-
             arrayFieldList[0] = "sumUplink";
             arrayFieldList[1] = "sumDownlink";
             for (int i = 0; i < fieldCount; i++) {
                 arrayFieldList[i + 2] = readConfig[i + 3];
             }
-
             int fileIndex = 0;
             String tag_1hex_str, tag_2hex_str, tag_3hex_str;
-
             int record_indx = 0;
             int recordCount = 1;
             int recordErrorCount = 0;
@@ -170,13 +156,13 @@ public class PGW2TXT {
             String recordErrorList = "";    //use for add to integer for convert integer to string
             int sumRecordLength = 0;
 
-            System.out.println(lineSeparator + "------------------------------------ (SeqNo:" + DecimalFormat.format((rawFileNo + 1)) + "/" + DecimalFormat.format(totalRawFile) + ") "
-                    + fileName + " ------------------------------------");
+//----------------------------- Start of log file ------------------------
+            System.out.println(lineSeparator + "------------------------------------ (SeqNo:" + DecimalFormat.format((rawFileNo + 1)) + "/"
+                    + DecimalFormat.format(totalRawFile) + ") " + fileName + " ------------------------------------");
             System.out.println("Start Time " + (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));      // Start of log file
-            FileIO.FileWriter(writeLogFileName, true, lineSeparator + "------------------------------------ (SeqNo:" + DecimalFormat.format((rawFileNo + 1)) + "/" + DecimalFormat.format(totalRawFile) + ") "
-                    + fileName + " ------------------------------------" + lineSeparator);
-            FileIO.FileWriter(writeLogFileName, true, "Start Time " + (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())) + lineSeparator);      // Start of log file
-
+            FileIO.FileWriter(writeLogFileName, true, lineSeparator + "------------------------------------ (SeqNo:" + DecimalFormat.format((rawFileNo + 1))
+                    + "/" + DecimalFormat.format(totalRawFile) + ") " + fileName + " ------------------------------------" + lineSeparator);
+            FileIO.FileWriter(writeLogFileName, true, "Start Time " + (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())) + lineSeparator);
             RawFile readFile = new RawFile(); // Create Object from class readRaw
             int[] rawFileInt = readFile.readBinaryFile(rawFilePathName);
             int fileLength = rawFileInt.length;
@@ -187,7 +173,7 @@ public class PGW2TXT {
             RawFile getRaw = new RawFile();                 // Create Object from class RawFile
             DataConverter data_conv = new DataConverter();  // Create Object from class DataConverter
 
-//---------------- Start of loop file process -----------------------------------
+//------------------------- Start of loop file process -----------------------------------
             do {
                 record_decode_data = "";    // Reset Recodr data buffer
                 String field_hex_str = "";  // Reset old record length
@@ -201,8 +187,6 @@ public class PGW2TXT {
                     notPGWCount = 0;          // Reset Record Error Counter
                     fileIndex = fileIndex + 2;
                     sumRecordLength = sumRecordLength + 2;
-//                System.out.println("############################## Record: " + recordCount + " ##############################");  // Debug
-//                System.out.println("Addr:" + fileIndex + " is PGW Record"); // Debug Print out
                     int record_len_byte = rawFileInt[fileIndex] - 0x80; //Check number of Byte is define Record length (1 or 2 Byte)
                     fileIndex++;
                     sumRecordLength = sumRecordLength + record_len_byte + 1;  // +1 = LengthByte
@@ -211,19 +195,15 @@ public class PGW2TXT {
                         fileIndex++;
                     }
                     field_hex_str = "0x" + field_hex_str; // Add prefix Hex String format (0x)
-
-//                System.out.println("fileLength:" + "0x" + String.format("%02X", fileLength) + " fileIndx:" + "0x" + String.format("%02X", +fileIndex)); //Debug
-//                System.out.println("field_hex_str:" + field_hex_str);     //Debug
                     int record_length = data_conv.hexString2int(field_hex_str); // Calculate Record length ( xxx Byte)
                     sumRecordLength = sumRecordLength + record_length;
-//                System.out.println("Record length:" + record_length + " Byte");    // Debug print
-//
-//---------------- Start of loop record process ------------------------     
+
+//------------------- Start of loop record process ------------------------     
                     try {
                         do {
-//---------- Start of Check Tag field length 1,2,3Byte ---------------------
+//------------ Start of Check Tag field length 1,2,3Byte ------------------
                             tag_1hex_str = "x" + String.format("%02X", rawFileInt[fileIndex]);    // Convert Integer to Hex String for check Tag field 1Byte
-//
+
 //----------------------------- Start of tag_1hex_str ---------------------------
                             System.out.println("------------------- Start of field (Record:" + recordCount + ") --------------------");
                             if (fieldConfig.contains(tag_1hex_str + ",")) {     // Check 1Byte Tag field is in Tag list table
@@ -235,11 +215,11 @@ public class PGW2TXT {
                                 String field_decode = field_conf.substring(field_conf.indexOf(",") + 1, field_conf.indexOf(",") + 2);
                                 int field_length = rawFileInt[fileIndex];
                                 if ("1".equals(field_decode)) {
-//
+
 //---------- Special check for Tag [xAC x81 (x80...x83)] not found in manual----------                    
                                     if (("xAC".equals(tag_1hex_str)) && (rawFileInt[fileIndex] > 0x80) && (rawFileInt[fileIndex + 2] == 0x30)) {
                                         fileIndex += 2;       //Skip 2Byte
-                                        record_indx += 2;    //Skip 2Byte
+                                        record_indx += 2;     //Skip 2Byte
                                         // ------- Check all sub field x30 Length -------
                                         int x30_indx = fileIndex;
                                         int x30_len = rawFileInt[x30_indx + 1] + 2;    //+1Byte for Skip tag x30; +2Byte(Tag+Length Byte)
@@ -257,7 +237,6 @@ public class PGW2TXT {
                                         record_decode_data = record_decode_data + "|" + field_decode_data;
                                     } //---------- End of Special check for Tag [xAC x81 (x80...x83)] not found in manual----------
                                     else {
-
                                         int[] field_raw_int = new int[field_length]; // Array for field raw data interger
                                         fileIndex++;
                                         record_indx++;
@@ -269,18 +248,11 @@ public class PGW2TXT {
                                         String field_decode_data = decode.decoder(tag_1hex_str, field_raw_int, field_conf);
                                         mapFieldData.put(tag_1hex_str, field_decode_data);  // push to HashMapArray
                                         record_decode_data = record_decode_data + tag_1hex_str + ":" + field_decode_data + "|";     //Test , Debug
-//                                    System.out.println("length: " + field_length + "|0x" + String.format("%02X", field_length) + " Byte");    // Debug print
-//                                    System.out.println("Field Decode Data:" + field_decode_data);     // Debug print
-//                        System.out.println("File Index:"+String.format("%02X", file_indx)); // Debug print
-//                        record_indx < record_length
-//                                    System.out.println("file_indx:" + "0x" + String.format("%02X", fileIndex) + " record_length:" + "0x" + String.format("%02X", +record_length) + " record_indx:" + "0x" + String.format("%02X", +record_indx) + " field_length:" + "0x" + String.format("%02X", field_length));   //Debug
-//                                    System.out.println("fileLength:" + "0x" + String.format("%02X", fileLength) + " fileIndx:" + "0x" + String.format("%02X", +fileIndex)); //Debug
                                     }
                                 } else {
                                     fileIndex = fileIndex + field_length + 1;   // Skip file index to next field
                                     record_indx = record_indx + field_length + 1;     // Add field_length to field_indx for correct field_indx position
                                 }
-//                            System.out.println("Field config: " + fieldConfig.substring(fieldConfig.indexOf(tag_1hex_str), tag_list_length));   // Debug print
 //----------------------------- End of tag_1hex_str ---------------------------
 
 //----------------------------- Start of tag_2hex_str ---------------------------
@@ -306,23 +278,16 @@ public class PGW2TXT {
                                         String field_decode_data = decode.decoder(tag_2hex_str, field_raw_int, field_conf);
                                         mapFieldData.put(tag_2hex_str, field_decode_data);  // push to HashMapArray
                                         record_decode_data = record_decode_data + tag_1hex_str + ":" + field_decode_data + "|";     //Test , Debug
-//                                    System.out.println("  length:" + field_length + "|0x" + String.format("%02X", field_length) + " Byte");    // Debug print
-//                                    System.out.println("Field Decode Data:" + field_decode_data);     // Debug print
-//                                    System.out.println("file_indx:" + "0x" + String.format("%02X", fileIndex) + " record_length:" + "0x" + String.format("%02X", +record_length) + " record_indx:" + "0x" + String.format("%02X", +record_indx) + " field_length:" + "0x" + String.format("%02X", field_length));   //Debug
-//                                    System.out.println("fileLength:" + "0x" + String.format("%02X", fileLength) + " fileIndx:" + "0x" + String.format("%02X", +fileIndex)); //Debug                            
                                     } else {
                                         fileIndex = fileIndex + field_length + 1;   // Skip file index to next field
                                         record_indx = record_indx + field_length + 1;     // Add field_length to field_indx for correct field_indx position
                                     }
-//                                System.out.println("Field config: " + fieldConfig.substring(fieldConfig.indexOf(tag_2hex_str), tag_list_length));   // Debug print
 //----------------------------- End of tag_2hex_str ---------------------------
 //
 //----------------------------- Start of tag_3hex_str ---------------------------
                                 } else {
                                     tag_3hex_str = tag_2hex_str.substring(0, 5) + String.format("%02X", rawFileInt[fileIndex + 2]);    // Convert Integer to Hex String for check Tag field 2Byte
-//                                System.out.println("tag_3hex_str:" + tag_3hex_str + ",");   //Debug
                                     if (fieldConfig.contains(tag_3hex_str)) {     // Check 3Byte Tag field is in Tag list table
-//                                    System.out.print("Field Tag: " + tag_3hex_str + "   Address: 0x" + String.format("%02X", fileIndex) + "  "); // Debug print
                                         fileIndex += 3;
                                         record_indx += 3;
                                         int tag_list_length = fieldConfig.indexOf("|", fieldConfig.indexOf(tag_3hex_str));
@@ -341,16 +306,11 @@ public class PGW2TXT {
                                             String field_decode_data = decode.decoder(tag_3hex_str, field_raw_int, field_conf);
                                             mapFieldData.put(tag_3hex_str, field_decode_data);  // push to HashMapArray
                                             record_decode_data = record_decode_data + tag_1hex_str + ":" + field_decode_data + "|";     //  Test , Debug
-//                                        System.out.println("  length:" + field_length + "|0x" + String.format("%02X", field_length) + " Byte");    // Debug print
-//                                        System.out.println("Field Decode Data:" + field_decode_data);     // Debug print
                                         } else {
                                             fileIndex = fileIndex + field_length + 1;   // Skip file index to next field
                                             record_indx = record_indx + field_length + 1;     // Add field_length to field_indx for correct field_indx position
                                         }
-//                                    System.out.println("Field config: " + fieldConfig.substring(fieldConfig.indexOf(tag_3hex_str), tag_list_length));   // Debug print
                                     } else {
-//                                    System.out.println("Unknow Tag!!! File address: " + "0x" + String.format("%02X", fileIndex));       // Debug
-//                                    System.out.println("Raw data remaining in process: " + (record_indx - record_length) + " Byte");    // Debug
 //*************  Skip to next Record and count error **********
                                         recordErrorCount++;
                                         recordErrorList = recordErrorList + recordCount + ",";
@@ -359,18 +319,16 @@ public class PGW2TXT {
                                     }
                                 }
                             }
-                            mapFieldData.put("sumDataUplink_record", Integer.toString(sumDataUplink_record));  // push to HashMapArray
-                            mapFieldData.put("sumDataDownlink_record", Integer.toString(sumDataDownlink_record));  // push to HashMapArray
+                            mapFieldData.put("sumDataUplink_record", Integer.toString(sumDataUplink_record));       // push to HashMapArray
+                            mapFieldData.put("sumDataDownlink_record", Integer.toString(sumDataDownlink_record));   // push to HashMapArray
 
-                            System.out.println("SumDataVolumeUplink: " + sumDataUplink_record + " ;  SumDataVolumeDownlink: " + sumDataDownlink_record);
+                            System.out.println("SumDataVolumeUplink: " + sumDataUplink_record + " ;  SumDataVolumeDownlink: " + sumDataDownlink_record);    // Debug
                         } while (fileIndex < sumRecordLength);
-
                     } catch (Exception ex) {
-//                    System.out.println("Record Error Raw data invalid format!!!");  // Debug
                         recordErrorCount++;
                         recordErrorList = recordErrorList + recordCount + ",";
                         addressErrorList = addressErrorList + "0x" + String.format("%02X", fileIndex) + ",";
-                        fileIndex = sumRecordLength;     //Skip Record error
+                        fileIndex = sumRecordLength;                //Skip Record error
                     }
                 } else {
                     if (notPGWCount < recordErrorCountLimit) {      // Set Limit of Record Error Count = 5
@@ -389,18 +347,11 @@ public class PGW2TXT {
                     }
                 }
                 recordCount++;
-//            System.out.println("record_decode_data=> " + record_decode_data);     //Debux print text data record
 
 //------***** Arrange dataDecode order by field list before write to array buffer (recordDataBuffer)  after that write from array (recordDataBuffer) to Text File
 //------***** mapFieldData
-//            Iterator<String> Vmap = mapFieldData.keySet().iterator();       // Debug print (Tag) = (DecodeData)
-//            while(Vmap.hasNext()){                                          // Debug print (Tag) = (DecodeData)
-//			String key = (String)(Vmap.next());  // Key         // Debug print (Tag) = (DecodeData)
-//			String val = mapFieldData.get(key); // Value        // Debug print (Tag) = (DecodeData)
-//			System.out.println(key + " = " + val);              // Debug print (Tag) = (DecodeData)
-//		}
                 int fieldTotal = arrayFieldList.length;
-                String keyTag, fieldValue;
+//                String keyTag, fieldValue;
                 String recordFieldData = sumDataUplink_record + "|" + sumDataDownlink_record + "|";
                 String getFieldData;
                 for (int i = 0; i < fieldTotal; i++) {
@@ -411,11 +362,10 @@ public class PGW2TXT {
                         recordFieldData = recordFieldData + "|";
                     }
                 }
-//            System.out.println("recordFieldData:"+recordFieldData);     //Debug
                 arrayRecordData.add(recordFieldData);   //write to array buffer before write to text file
-                mapFieldData.clear();           // Clear array buffer
-                sumDataUplink_record = 0;       //Reset value
-                sumDataDownlink_record = 0;     //Reset value
+                mapFieldData.clear();                   // Clear array buffer
+                sumDataUplink_record = 0;               //Reset value
+                sumDataDownlink_record = 0;             //Reset value
             } while ((fileIndex + 1) < fileLength);     // +1Byet for adjust length (protect array out of bound)
 //
 //----------------- End of File Summarry Report -------------------  
