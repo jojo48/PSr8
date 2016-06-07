@@ -95,7 +95,7 @@ public class PGW2TXT {
         System.out.println("PathBackupRawFile:    = " + pathBackupRawFile);
         System.out.println("PathLogFile:          = " + pathLogData);
         System.out.println("PathBackupErrorFile:  = " + pathBackupRawFileError);
-        System.out.println("RawFileExtension:     = " + "\"" + rawFileExtension + "\"");
+        System.out.println("RawFileExtension:     = " + rawFileExtension);
         System.out.println("CopyRawToBackup       = " + copyRawToBackup);
         System.out.println("BackupWithGzip        = " + backupWithGzip);
         System.out.println("DeleteOriginalRawFile = " + deleteOriginalRawFile);
@@ -117,7 +117,7 @@ public class PGW2TXT {
         FileIO.FileWriter(writeLogFileName, true, "PathBackupRawFile:    = " + pathBackupRawFile + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "PathLogFile:          = " + pathLogData + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "PathBackupErrorFile:  = " + pathBackupRawFileError + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "RawFileExtension:     = " + "\"" + rawFileExtension + "\"" + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "RawFileExtension:     = " + rawFileExtension+ lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "CopyRawToBackup       = " + copyRawToBackup + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "BackupWithGzip        = " + backupWithGzip + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "DeleteOriginalRawFile = " + deleteOriginalRawFile + lineSeparator);
@@ -157,12 +157,12 @@ public class PGW2TXT {
             int sumRecordLength = 0;
 
 //----------------------------- Start of log file ------------------------
-            System.out.println(lineSeparator + "------------------------------------ (SeqNo:" + DecimalFormat.format((rawFileNo + 1)) + "/"
+            System.out.println(lineSeparator + "------------------------------------ (FileSeqNo:" + DecimalFormat.format((rawFileNo + 1)) + "/"
                     + DecimalFormat.format(totalRawFile) + ") " + fileName + " ------------------------------------");
-            System.out.println("Start Time " + (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));      // Start of log file
-            FileIO.FileWriter(writeLogFileName, true, lineSeparator + "------------------------------------ (SeqNo:" + DecimalFormat.format((rawFileNo + 1))
+            System.out.println("File Start Time " + (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));      // Start of log file
+            FileIO.FileWriter(writeLogFileName, true, lineSeparator + "------------------------------------ (FileSeqNo:" + DecimalFormat.format((rawFileNo + 1))
                     + "/" + DecimalFormat.format(totalRawFile) + ") " + fileName + " ------------------------------------" + lineSeparator);
-            FileIO.FileWriter(writeLogFileName, true, "Start Time " + (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())) + lineSeparator);
+            FileIO.FileWriter(writeLogFileName, true, "File Start Time " + (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())) + lineSeparator);
             RawFile readFile = new RawFile(); // Create Object from class readRaw
             int[] rawFileInt = readFile.readBinaryFile(rawFilePathName);
             int fileLength = rawFileInt.length;
@@ -205,9 +205,9 @@ public class PGW2TXT {
                             tag_1hex_str = "x" + String.format("%02X", rawFileInt[fileIndex]);    // Convert Integer to Hex String for check Tag field 1Byte
 
 //----------------------------- Start of tag_1hex_str ---------------------------
-                            System.out.println("------------------- Start of field (Record:" + recordCount + ") --------------------");
+//                            System.out.println("------------------- Start of field (Record:" + recordCount + ") --------------------");     // Debug
                             if (fieldConfig.contains(tag_1hex_str + ",")) {     // Check 1Byte Tag field is in Tag list table
-                                System.out.print("Field Tag: " + tag_1hex_str + "   Address: 0x" + String.format("%02X", fileIndex) + "  "); // Debug print
+//                                System.out.print("Field Tag: " + tag_1hex_str + "   Address: 0x" + String.format("%02X", fileIndex) + "  "); // Debug print
                                 fileIndex++;
                                 record_indx++;
                                 int tag_list_length = fieldConfig.indexOf("|", fieldConfig.indexOf(tag_1hex_str));
@@ -259,7 +259,7 @@ public class PGW2TXT {
                             } else {
                                 tag_2hex_str = tag_1hex_str.substring(0, 3) + String.format("%02X", rawFileInt[fileIndex + 1]);    // Convert Integer to Hex String for check Tag field 2Byte
                                 if (fieldConfig.contains(tag_2hex_str + ",")) {     // Check 2Byte Tag field is in Tag list table
-                                    System.out.print("Field Tag: " + tag_2hex_str + "   Address: 0x" + String.format("%02X", fileIndex) + "  "); // Debug print
+//                                    System.out.print("Field Tag: " + tag_2hex_str + "   Address: 0x" + String.format("%02X", fileIndex) + "  "); // Debug print
                                     fileIndex += 2;
                                     record_indx += 2;
                                     int tag_list_length = fieldConfig.indexOf("|", fieldConfig.indexOf(tag_2hex_str));
@@ -322,7 +322,7 @@ public class PGW2TXT {
                             mapFieldData.put("sumDataUplink_record", Integer.toString(sumDataUplink_record));       // push to HashMapArray
                             mapFieldData.put("sumDataDownlink_record", Integer.toString(sumDataDownlink_record));   // push to HashMapArray
 
-                            System.out.println("SumDataVolumeUplink: " + sumDataUplink_record + " ;  SumDataVolumeDownlink: " + sumDataDownlink_record);    // Debug
+//                            System.out.println("SumDataVolumeUplink: " + sumDataUplink_record + " ;  SumDataVolumeDownlink: " + sumDataDownlink_record);    // Debug
                         } while (fileIndex < sumRecordLength);
                     } catch (Exception ex) {
                         recordErrorCount++;
@@ -378,8 +378,8 @@ public class PGW2TXT {
             if (addressErrorList.length() > 0) {
                 addressErrorList = "[Address:" + addressErrorList.substring(0, (addressErrorList.length() - 1)) + "]}";
             }
-            System.out.println("");
-            System.out.println("***************************************** End of file *****************************************");
+//            System.out.println("");     //Debug
+//            System.out.println("***************************************** End of file *****************************************");  // Debug
             System.out.println("Record Total:" + DecimalFormat.format(recordCount - 1) + " ;  Records Error:" + DecimalFormat.format(recordErrorCount)
                     + recordErrorList + addressErrorList);
             System.out.println("Raw Data Remaining(can't process):" + ((fileLength - 1) - fileIndex) + " Byte");
@@ -392,10 +392,10 @@ public class PGW2TXT {
             if (recordErrorCount > 0 | notPGWCount > 0) {                                 // if have record error increment file error counter
                 rawFileErrorList = rawFileErrorList + (rawFileNo + 1) + ",";
                 rawFileErrorCount++;
-                listRawFileError = listRawFileError + DecimalFormat.format(rawFileErrorCount) + ". (SeqNo:" + DecimalFormat.format((rawFileNo + 1)) + ") " + fileName + lineSeparator;
-                backupRawDestination = pathBackupRawFileError + fileName;     // Save Backup RAW File To == > PathBackupRawFileError
+                listRawFileError = listRawFileError + DecimalFormat.format(rawFileErrorCount) + ". (FileSeqNo:" + DecimalFormat.format((rawFileNo + 1)) + ") " + fileName + lineSeparator;
+                backupRawDestination = pathBackupRawFileError + fileName;       // Save Backup RAW File To == > PathBackupRawFileError
             } else {
-                backupRawDestination = pathBackupRawFile + fileName;     // Save Backup RAW File To == > PathBackupRawFile
+                backupRawDestination = pathBackupRawFile + fileName;            // Save Backup RAW File To == > PathBackupRawFile
             }
             String writeFileName = pathDecodeData + fileName + ".txt";
 //
@@ -410,7 +410,7 @@ public class PGW2TXT {
 
             File textData = new File(writeFileName);
             if (textData.exists()) {
-                System.out.println("Decode File: " + fileName + " FileSize " + DecimalFormat.format(fileLength) + " Bytes ==> " + DecimalFormat.format((recordCount - 1)) + "/" + DecimalFormat.format(recordErrorCount) + " Records(Total/Error)");
+//                System.out.println("Decode File: " + fileName + " FileSize " + DecimalFormat.format(fileLength) + " Bytes ==> " + DecimalFormat.format((recordCount - 1)) + "/" + DecimalFormat.format(recordErrorCount) + " Records(Total/Error)");    //Debug
 
             } else {
                 System.out.println("Directory " + pathDecodeData + " Not exists !!!");
@@ -449,7 +449,7 @@ public class PGW2TXT {
             arrayRecordData.clear();
         }
         if (rawFileErrorCount > 0) {
-            rawFileErrorList = " {SeqNo:" + rawFileErrorList.substring(0, (rawFileErrorList.length() - 1)) + "}";
+            rawFileErrorList = " {FileSeqNo:" + rawFileErrorList.substring(0, (rawFileErrorList.length() - 1)) + "}";
         }
         FileIO.FileWriter(writeLogFileName, true, lineSeparator + "\r\n============================================== Decode Summary ==============================================" + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "Total File: " + DecimalFormat.format(totalRawFile) + " ;  File Error:" + DecimalFormat.format(rawFileErrorCount)
