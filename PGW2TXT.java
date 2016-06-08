@@ -25,10 +25,11 @@ public class PGW2TXT {
 
     public static final String lineSeparator = System.getProperty("line.separator");
     public static final String pathSeparator = File.separator;
-    public static int sumDataUplink_file = 0;
-    public static int sumDataDownlink_file = 0;
-    public static int sumDataUplink_record = 0;
-    public static int sumDataDownlink_record = 0;
+    
+    public static double sumDataUplink_record = 0;
+    public static double sumDataDownlink_record = 0;
+    public static double sumDataUplink_file = 0;
+    public static double sumDataDownlink_file = 0;
     public static double sumDataUplink_allFile = 0;
     public static double sumDataDownlink_allFile = 0;
     public static double sumRecord_allFile = 0;
@@ -315,8 +316,8 @@ public class PGW2TXT {
                                     }
                                 }
                             }
-                            mapFieldData.put("sumDataUplink_record", Integer.toString(sumDataUplink_record));       // push to HashMapArray
-                            mapFieldData.put("sumDataDownlink_record", Integer.toString(sumDataDownlink_record));   // push to HashMapArray
+                            mapFieldData.put("sumDataUplink_record", Double.toString(sumDataUplink_record));       // push to HashMapArray
+                            mapFieldData.put("sumDataDownlink_record", Double.toString(sumDataDownlink_record));   // push to HashMapArray
                         } while (fileIndex < sumRecordLength);
                     } catch (Exception ex) {
                         recordErrorCount++;
