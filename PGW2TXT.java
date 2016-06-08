@@ -376,8 +376,13 @@ System.out.println("xACx30.fileIndex:"+String.format("%02X",fileIndex)+" record_
                 recordCount++;
 
 //------***** Arrange dataDecode order by field list before write to array buffer (recordDataBuffer)  after that write from array (recordDataBuffer) to Text File
+<<<<<<< HEAD
                 //------***** mapFieldData
+=======
+//------***** mapFieldData
+>>>>>>> parent of ec21c19... Add condition if have record error or field error
                 int fieldTotal = arrayFieldList.length;
+//                String keyTag, fieldValue;
                 String recordFieldData = sumDataUplink_record + "|" + sumDataDownlink_record + "|";
                 String getFieldData;
                 for (int i = 0; i < fieldTotal; i++) {
@@ -388,10 +393,10 @@ System.out.println("xACx30.fileIndex:"+String.format("%02X",fileIndex)+" record_
                         recordFieldData = recordFieldData + "|";
                     }
                 }
-                arrayRecordData.add(recordFieldData);   // write to array buffer before write to text file
+                arrayRecordData.add(recordFieldData);   //write to array buffer before write to text file
                 mapFieldData.clear();                   // Clear array buffer
-                sumDataUplink_record = 0;               // Reset value
-                sumDataDownlink_record = 0;             // Reset value
+                sumDataUplink_record = 0;               //Reset value
+                sumDataDownlink_record = 0;             //Reset value
             } while ((fileIndex + 1) < fileLength);     // +1Byet for adjust length (protect array out of bound)
 //
 //----------------- End of File Summarry Report -------------------  
@@ -422,27 +427,20 @@ System.out.println("xACx30.fileIndex:"+String.format("%02X",fileIndex)+" record_
                 backupRawDestination = pathBackupRawFile + fileName;            // Save Backup RAW File To == > PathBackupRawFile
             }
             String writeFileName = pathDecodeData + fileName + ".txt";
-
-//-------------------------------------------- Write Decode Data to Text File --------------------------------------------
-//  1. Check If File Decode Error or Have a Record Error ==> Nothing Write to Text File
-//  1. Check Folder Existing Before Write File 
-//  2. Write Decode Data To Text File 
-//------------------------------------------------------------------------------------------------------------------------
-            if (!(recordErrorCount > 0 | notPGWCount > 0)) {
-                File pathTextData = new File(pathDecodeData);
-                if (pathTextData.exists()) {
-                    FileIO.bufferWriter(writeFileName, arrayRecordData);     // Write output to text file
-                } else {
-                    System.out.println("Directory " + pathDecodeData + " Not exists !!!");
-                }
-
-                File textData = new File(writeFileName);
-                if (textData.exists()) {
-                } else {
-                    System.out.println("Directory " + pathDecodeData + " Not exists !!!");
-                }
+//
+//------------ Check Folder Existing Before Write File ------------------------
+//        
+            File pathTextData = new File(pathDecodeData);
+            if (pathTextData.exists()) {
+                FileIO.bufferWriter(writeFileName, arrayRecordData);     // Write output to text file
             } else {
-                // File Decode Error or Have a Record Error ==> Nothing To Do
+                System.out.println("Directory " + pathDecodeData + " Not exists !!!");
+            }
+
+            File textData = new File(writeFileName);
+            if (textData.exists()) {
+            } else {
+                System.out.println("Directory " + pathDecodeData + " Not exists !!!");
             }
 
 //------------------------------------- Backup Original RAW File --------------------------------------------     
