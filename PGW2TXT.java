@@ -177,8 +177,8 @@ public class PGW2TXT {
             do {
                 record_decode_data = "";    // Reset Recodr data buffer
                 String field_hex_str = "";  // Reset old record length
-                sumDataUplink_file = 0;     // Reset Counter
-                sumDataDownlink_file = 0;   // Reset Counter
+//                sumDataUplink_file = 0;     // Reset Counter
+//                sumDataDownlink_file = 0;   // Reset Counter
                 HashMap<String, String> mapFieldData = new HashMap<>();  //Create HashMap for store field data decoded
 
 //------------------------- Start of loop record process ------------------------
@@ -216,25 +216,53 @@ public class PGW2TXT {
 
 //---------- Special check for Tag [xAC x81 (x80...x83)] not found in manual----------                    
                                     if (("xAC".equals(tag_1hex_str)) && (rawFileInt[fileIndex] > 0x80) && (rawFileInt[fileIndex + 2] == 0x30)) {
-                                        fileIndex += 2;       //Skip 2Byte
-                                        record_indx += 2;     //Skip 2Byte
-// ------- Check all sub field x30 Length -------
+
+//                                    if (("xAC".equals(tag_1hex_str)) && (rawFileInt[fileIndex] > 0x80)) { 
+
+                                        
+                                        fileIndex += 2;       //Skip 2Byte  (Skip 0x8.., 0x8..)
+                                        record_indx += 2;     //Skip 2Byte  (Skip 0x8.., 0x8..)
+                                        
+ System.out.println("xACx81.fileIndex:"+String.format("%02X",fileIndex)+" record_indx:"+String.format("%02X",record_indx)+" rawFileInt[fileIndex]:"+String.format("%02X",rawFileInt[fileIndex])); // Debug
+                                      
+// ------- Check all sub field x30 Length -------   // Old Remark Header
+
+
+//  **************** Calculate Length of xAC ************************** // New Remark
+                                        
                                         int x30_indx = fileIndex;
+                                        
+//                                        int x30_len;    //+2Byte for Skip tag x30 and Lengt;
+                                        
+//                                        while(rawFileInt[fileIndex]==0x30){
                                         int x30_len = rawFileInt[x30_indx + 1] + 2;    //+1Byte for Skip tag x30; +2Byte(Tag+Length Byte)
+//                                        
+//                                        x30_len = rawFileInt[fileIndex + 1]+2;    //+1Byte for Skip tag x30; +2Byte(Tag+Length Byte)
 
                                         while (rawFileInt[(x30_indx + x30_len)] == 0x30) {
                                             x30_len = x30_len + 2 + rawFileInt[(x30_indx + x30_len + 1)];    //+2Byte for Skip Tag and Length Byte
                                         }
 
+//                                        int x30_len=rawFileInt[fileIndex+1];
                                         int[] field_raw_int = new int[x30_len];
                                         for (int i = 0; i < x30_len; i++) {
                                             field_raw_int[i] = rawFileInt[fileIndex];
                                             fileIndex++;
+                                            record_indx++;
                                         }
+//                                        String field_decode_data = decode.decoder(tag_1hex_str, field_raw_int, field_conf);
+//                                        record_decode_data = record_decode_data + "|" + field_decode_data;
                                         String field_decode_data = decode.decoder(tag_1hex_str, field_raw_int, field_conf);
-                                        record_decode_data = record_decode_data + "|" + field_decode_data;
+                                        mapFieldData.put(tag_1hex_str, field_decode_data);  // push to HashMapArray
+                                        record_decode_data = record_decode_data + tag_1hex_str + ":" + field_decode_data + "|";     //Test , Debug
+                                        
+//                                    }
                                     } //---------- End of Special check for Tag [xAC x81 (x80...x83)] not found in manual----------
+                                    
                                     else {
+                                    
+System.out.println("xACx30.fileIndex:"+String.format("%02X",fileIndex)+" record_indx:"+String.format("%02X",record_indx)+" rawFileInt[fileIndex]:"+String.format("%02X",rawFileInt[fileIndex])); // Debug
+
                                         int[] field_raw_int = new int[field_length]; // Array for field raw data interger
                                         fileIndex++;
                                         record_indx++;
@@ -344,7 +372,7 @@ public class PGW2TXT {
                 recordCount++;
 
 //------***** Arrange dataDecode order by field list before write to array buffer (recordDataBuffer)  after that write from array (recordDataBuffer) to Text File
-                        //------***** mapFieldData
+                //------***** mapFieldData
                 int fieldTotal = arrayFieldList.length;
                 String recordFieldData = sumDataUplink_record + "|" + sumDataDownlink_record + "|";
                 String getFieldData;
@@ -356,10 +384,10 @@ public class PGW2TXT {
                         recordFieldData = recordFieldData + "|";
                     }
                 }
-                arrayRecordData.add(recordFieldData);   // write to array buffer before write to text file
+                arrayRecordData.add(recordFieldData);   //write to array buffer before write to text file
                 mapFieldData.clear();                   // Clear array buffer
-                sumDataUplink_record = 0;               // Reset value
-                sumDataDownlink_record = 0;             // Reset value
+                sumDataUplink_record = 0;               //Reset value
+                sumDataDownlink_record = 0;             //Reset value
             } while ((fileIndex + 1) < fileLength);     // +1Byet for adjust length (protect array out of bound)
 //
 //----------------- End of File Summarry Report -------------------  
@@ -390,46 +418,39 @@ public class PGW2TXT {
                 backupRawDestination = pathBackupRawFile + fileName;            // Save Backup RAW File To == > PathBackupRawFile
             }
             String writeFileName = pathDecodeData + fileName + ".txt";
-
-//-------------------------------------------- Write Decode Data to Text File --------------------------------------------
-//  1. Check If File Decode Error or Have a Record Error ==> Nothing Write to Text File
-//  1. Check Folder Existing Before Write File 
-//  2. Write Decode Data To Text File 
-//------------------------------------------------------------------------------------------------------------------------
-            if (!(recordErrorCount > 0 | notPGWCount > 0)) {
-                File pathTextData = new File(pathDecodeData);
-                if (pathTextData.exists()) {
-                    FileIO.bufferWriter(writeFileName, arrayRecordData);     // Write output to text file
-                } else {
-                    System.out.println("Directory " + pathDecodeData + " Not exists !!!");
-                }
-
-                File textData = new File(writeFileName);
-                if (textData.exists()) {
-                } else {
-                    System.out.println("Directory " + pathDecodeData + " Not exists !!!");
-                }
+//
+//------------ Check Folder Existing Before Write File ------------------------
+//        
+            File pathTextData = new File(pathDecodeData);
+            if (pathTextData.exists()) {
+                FileIO.bufferWriter(writeFileName, arrayRecordData);     // Write output to text file
             } else {
-                // File Decode Error or Have a Record Error ==> Nothing To Do
+                System.out.println("Directory " + pathDecodeData + " Not exists !!!");
+            }
+
+            File textData = new File(writeFileName);
+            if (textData.exists()) {
+            } else {
+                System.out.println("Directory " + pathDecodeData + " Not exists !!!");
             }
 
 //------------------------------------- Backup Original RAW File --------------------------------------------     
 //   1. Select Backup (Yes/No)
-//   2. Select Type of Backup (RAW/Gzip)
-//   3. Delete Original RAW File (Yes/No)
+//      1.1 Select Type of Backup (RAW/Gzip)
+//   2. Delete Original RAW File (Yes/No)
 //-----------------------------------------------------------------------------------------------------------
-            if (copyRawToBackup.equals("YES")) {      // Check Backup (Yes/No)
-                if (backupWithGzip.equals("YES")) {   // Check Type of Backup (RAW/Gzip)
+            if (copyRawToBackup.equals("YES")) {                                    // 1. Check Backup (Yes/No)
+                if (backupWithGzip.equals("YES")) {                                 //      1.1 Check Type of Backup (RAW/Gzip)
                     backupRawDestination = backupRawDestination + fileName + ".gz";
-                    if (FileIO.gZIP(rawFilePathName, backupRawDestination)) {     // Create Gzip and Check File *.gz Is Created
+                    if (FileIO.gZIP(rawFilePathName, backupRawDestination)) {       // Create Gzip and Check File *.gz Is Created
 //                        System.out.println("gZIP Complete");    // Debug
                     } else {
 //                        System.out.println("gZIP Error");       // Debug
                     }
                 } else {      //----------------- copy RAW File To Backup RAW File Path ---------------------
-                    File rawFileSourcePath = new File(rawFilePathName); //("H:\\work-temp\\file");     //source
+                    File rawFileSourcePath = new File(rawFilePathName);             //source path
                     backupRawDestination = backupRawDestination + fileName;
-                    File backupRawPath = new File(backupRawDestination);  //("H:\\work-temp\\file2");       //dest
+                    File backupRawPath = new File(backupRawDestination);            //destination path
                     try {
                         FileUtils.copyFile(rawFileSourcePath, backupRawPath);
                     } catch (IOException e) {
@@ -439,12 +460,26 @@ public class PGW2TXT {
                 //----------------- Skip Backup Original RAW File --------------------
             }
 
-            if (deleteOriginalRawFile.equals("YES")) {    // Delete Original RAW File (Yes/No)
+            if (deleteOriginalRawFile.equals("YES")) {                              // 2.Delete Original RAW File (Yes/No)
                 File fileToDelete = FileUtils.getFile(rawFilePathName);
                 FileUtils.deleteQuietly(fileToDelete);
             }
+
+//------------------------------------------- End of File Process Clear Counter ----------------------------------------
             arrayRecordData.clear();
+            sumDataUplink_record = 0;
+            sumDataDownlink_record = 0;
+            sumDataUplink_file = 0;
+            sumDataDownlink_file = 0;
+            
+//            sumDataUplink_allFile = 0;
+//            sumDataDownlink_allFile = 0;
+
         }
+
+//############################################ End of all File Decoder ###################################################
+//############################################# Decode Summary Report ####################################################        
+//        
         if (rawFileErrorCount > 0) {
             rawFileErrorList = " {FileSeqNo:" + rawFileErrorList.substring(0, (rawFileErrorList.length() - 1)) + "}";
         }
