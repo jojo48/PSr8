@@ -17,7 +17,7 @@ public class FieldDecoder {
     public String decoder(String tag_hex_str, int[] field_raw_data, String field_conf) {
         String field_decode_data;
 
-//-------------------- Switch to decode tag ---------------------------------
+//-------------------- Switch For decode tag ---------------------------------
         switch (tag_hex_str) {
 
 //---------------------- Start of case x80 (recordType) ----------------------
@@ -128,7 +128,7 @@ public class FieldDecoder {
             case "x8D":
                 field_decode_data = DataConverter.Int2DateTime(field_raw_data);   // Octet String
                 return field_decode_data;
-//---------------------- End of case x88 ----------------------                
+//---------------------- End of case x88 ----------------------
 
 //---------------------- Start of case x8E (duration) ----------------------
             case "x8E":
@@ -138,7 +138,7 @@ public class FieldDecoder {
                 }
                 field_decode_data = Long.toString(Long.decode(field_raw_hex_string));
                 return field_decode_data;
-//---------------------- End of case x88 ----------------------                
+//---------------------- End of case x88 ----------------------
 
 //---------------------- Start of case x8F (causeForRecClosing) ----------------------
             case "x8F":
@@ -148,7 +148,7 @@ public class FieldDecoder {
                 }
                 field_decode_data = Long.toString(Long.decode(field_raw_hex_string));
                 return field_decode_data;
-//---------------------- End of case x88 ----------------------                 
+//---------------------- End of case x88 ----------------------
 
 //---------------------- Start of case xA9 (servedPDPPDNAddress) ----------------------
             case "xA9":
@@ -188,7 +188,7 @@ public class FieldDecoder {
                     String decode_data_xAC_x30;
                     int xAC_indx = 0;
                     int xAC_len = field_raw_data.length;
-                    
+
                     do {
                         int xAC30_sub_len = field_raw_data[xAC_indx + 1];  //  +2 for TagHeader & Length
                         int[] raw_xAC_x30 = new int[xAC30_sub_len];
@@ -207,13 +207,9 @@ public class FieldDecoder {
 
                 field_decode_data = field_decode_data.substring(1, field_decode_data.length());  //trim first comma (,)
                 field_decode_data = "{" + field_decode_data + "}";
-//----------- DeBug----------------
-//                field_decode_data=DataConverter.Int2HexString(field_raw_data)+field_decode_data;
-                System.out.println("Dump xAC = "+DataConverter.Int2HexString(field_raw_data));      // Debug Dump xAC
-                
                 return field_decode_data;
-
 //---------------------- End of case xAC ----------------------
+
 //---------------------- Start of case x91 (recordSequenceNumber) ----------------------
             case "x91":
                 field_raw_hex_string = "0x";
@@ -222,14 +218,14 @@ public class FieldDecoder {
                 }
                 field_decode_data = Long.toString(Long.decode(field_raw_hex_string));
                 return field_decode_data;
-//---------------------- End of case x91 ----------------------       
+//---------------------- End of case x91 ----------------------
 
 //---------------------- Start of case x92 (nodeID) ----------------------
             case "x92":
                 field_decode_data = DataConverter.IA5String(field_raw_data);
                 return field_decode_data;
 //---------------------- End of case x92 ----------------------
-                
+
 //---------------------- Start of case x94 (localSequenceNumber) ----------------------
             case "x94":
                 field_raw_hex_string = "0x";
@@ -238,24 +234,24 @@ public class FieldDecoder {
                 }
                 field_decode_data = Long.toString(Long.decode(field_raw_hex_string));
                 return field_decode_data;
-//---------------------- End of case x94 ----------------------                        
+//---------------------- End of case x94 ----------------------
 
 //---------------------- Start of case x95 (apnSelectionMode) ----------------------
             case "x95":
                 field_decode_data = Integer.toString(field_raw_data[0]);
                 return field_decode_data;
-//---------------------- End of case x95 ----------------------        
-        
+//---------------------- End of case x95 ----------------------
+
 //---------------------- Start of case x96 (servedMSISDN) ----------------------
             case "x96":
                 int[] servedMSISDN_int = new int[field_raw_data.length];
                 if (field_raw_data.length == 7) {
                     for (int i = 0; i < 6; i++) {
-                        servedMSISDN_int[i] = field_raw_data[i+1];  // Delete First Byte (91)
+                        servedMSISDN_int[i] = field_raw_data[i + 1];  // Delete First Byte (91)
                     }
                     field_decode_data = DataConverter.tBCD2String(servedMSISDN_int);
                 } else {
-                    for (int i = 0; i < (field_raw_data.length-1); i++) {
+                    for (int i = 0; i < (field_raw_data.length - 1); i++) {
                         servedMSISDN_int[i] = field_raw_data[i + 1];
                     }
                     field_decode_data = DataConverter.tBCD2String(servedMSISDN_int);    // Delete First Byte (91)
@@ -298,7 +294,7 @@ public class FieldDecoder {
             case "xB0":
                 field_decode_data = DataConverter.Int2HexString(field_raw_data);
                 return field_decode_data;
-//---------------------- End of case x97 ----------------------                        
+//---------------------- End of case x97 ----------------------
 
 //---------------------- Start of case x9F 1F (mSTimeZone) ----------------------
             case "x9F1F":
@@ -310,7 +306,7 @@ public class FieldDecoder {
             case "x9F20":
                 field_decode_data = SubFieldDecoder.userLocInfo(field_raw_data);
                 return field_decode_data;
-//---------------------- End of case x9F 20 ---------------------- 
+//---------------------- End of case x9F 20 ----------------------
 
 //---------------------- Start of case xBF 23 (servingNodeType) ----------------------
             case "xBF23":
