@@ -207,6 +207,10 @@ public class FieldDecoder {
 
                 field_decode_data = field_decode_data.substring(1, field_decode_data.length());  //trim first comma (,)
                 field_decode_data = "{" + field_decode_data + "}";
+//----------- DeBug----------------
+//                field_decode_data=DataConverter.Int2HexString(field_raw_data)+field_decode_data;
+                System.out.println("Dump xAC = "+DataConverter.Int2HexString(field_raw_data));      // Debug Dump xAC
+                
                 return field_decode_data;
 
 //---------------------- End of case xAC ----------------------
