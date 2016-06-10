@@ -15,18 +15,18 @@ import java.io.IOException;
  */
 public class Main_PGW {
 
-    public static int sumDataUplink_file = 0;
-    public static int sumDataDownlink_file = 0;
-    public static int sumDataUplink_record = 0;
-    public static int sumDataDownlink_record = 0;
+    public static long sumDataUplink_file = 0;
+    public static long sumDataDownlink_file = 0;
+    public static long sumDataUplink_record = 0;
+    public static long sumDataDownlink_record = 0;
 
-    public void DataUplink(int dataUplink) {
+    public void DataUplink(long dataUplink) {
         sumDataUplink_file = sumDataUplink_file + dataUplink;
         sumDataUplink_record = sumDataUplink_record + dataUplink;
 
     }
 
-    public void DataDownlink(int dataDownlink) {
+    public void DataDownlink(long dataDownlink) {
         sumDataDownlink_file = sumDataDownlink_file + dataDownlink;
         sumDataDownlink_record = sumDataDownlink_record + dataDownlink;
     }

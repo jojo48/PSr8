@@ -26,22 +26,22 @@ public class PGW2TXT {
     public static final String lineSeparator = System.getProperty("line.separator");
     public static final String pathSeparator = File.separator;
     
-    public static double sumDataUplink_record = 0;
-    public static double sumDataDownlink_record = 0;
-    public static double sumDataUplink_file = 0;
-    public static double sumDataDownlink_file = 0;
-    public static double sumDataUplink_allFile = 0;
-    public static double sumDataDownlink_allFile = 0;
-    public static double sumRecord_allFile = 0;
-    public static double sumRecordError_allFile = 0;
+    public static long sumDataUplink_record = 0;
+    public static long sumDataDownlink_record = 0;
+    public static long sumDataUplink_file = 0;
+    public static long sumDataDownlink_file = 0;
+    public static long sumDataUplink_allFile = 0;
+    public static long sumDataDownlink_allFile = 0;
+    public static long sumRecord_allFile = 0;
+    public static long sumRecordError_allFile = 0;
 
-    public void DataUplink(int dataUplink) {
+    public void DataUplink(long dataUplink) {
         sumDataUplink_allFile = sumDataUplink_allFile + dataUplink;
         sumDataUplink_file = sumDataUplink_file + dataUplink;
         sumDataUplink_record = sumDataUplink_record + dataUplink;
     }
 
-    public void DataDownlink(int dataDownlink) {
+    public void DataDownlink(long dataDownlink) {
         sumDataDownlink_allFile = sumDataDownlink_allFile + dataDownlink;
         sumDataDownlink_file = sumDataDownlink_file + dataDownlink;
         sumDataDownlink_record = sumDataDownlink_record + dataDownlink;
@@ -54,10 +54,13 @@ public class PGW2TXT {
 
         FileIO FileIO = new FileIO();
         String pathFileConfig = "D:\\Training\\Java\\SourceCode\\pgw\\PGWr8.csv";
-        String[] readConfig = FileIO.ReadFileConfig(pathFileConfig);    //Return with array of header group
-        String pathConfig = readConfig[0];                              // String of Path Configuration
-        String fieldConfig = readConfig[1];                             // String of Tag Field list
+        String fieldListFileName = "FieldList.txt";
+        String[] readConfig = FileIO.ReadFileConfig(pathFileConfig);    // Return with array of header group
+        String pathConfig = readConfig[0];                                  // Array readConfig address 0 = String of Path Configuration
+        String fieldConfig = readConfig[1];                                 // Array readConfig address 1 = String of Tag Field list
         String record_decode_data;                                      // Recodr data buffer
+        
+//        System.out.println("fieldConfig:"+fieldConfig);     // Debug Display fieldConfig
 
 //#################################### Read Configuration and Store to ArrayList ###############################################
 //
@@ -65,8 +68,9 @@ public class PGW2TXT {
         int pathConfig_indxEnd = 0;
         int offsetStart = 0;                                            // use for check and Skip "|"
 
+//------------------------- Create Array List Path and Config -------------------
+//        
         HashMap<String, String> listPathConfig = new HashMap<>();       //Create HashMap for store field data decoded
-
         do {
             pathConfig_indxStart = pathConfig_indxEnd + offsetStart;
             pathConfig_indxEnd = pathConfig.indexOf("|", pathConfig_indxEnd + 1);
@@ -78,76 +82,281 @@ public class PGW2TXT {
         } while (pathConfig_indxEnd + 1 < pathConfig.length());
 
         String pathRawData = listPathConfig.get("RawFile");
-        String pathDecodeData = listPathConfig.get("DecodeFile");
+        String pathDecodeFile = listPathConfig.get("DecodeFile");
+        String pathDecodeFileError = listPathConfig.get("DecodeFileError");
         String pathBackupRawFile = listPathConfig.get("BackupRawFile");
         String pathLogData = listPathConfig.get("LogFile");
         String pathBackupRawFileError = listPathConfig.get("BackupRawFileError");
+        String pathDecodeDetailFile = listPathConfig.get("DecodeDetailFile");
         String rawFileExtension = listPathConfig.get("RawFileExtension");
         String copyRawToBackup = (listPathConfig.get("CopyRawToBackup")).toUpperCase();
         String backupWithGzip = (listPathConfig.get("BackupWithGzip")).toUpperCase();
         String deleteOriginalRawFile = (listPathConfig.get("DeleteOriginalRawFile")).toUpperCase();
+        String createDetailTextFile = (listPathConfig.get("CreateDetailTextFile")).toUpperCase();
+        String createOutputSelectedFieldOnly = (listPathConfig.get("CreateOutputSelectedFieldOnly")).toUpperCase();
         int recordErrorCountLimit = Integer.parseInt(listPathConfig.get("RecordErrorCountLimit"));
 
         System.out.println(lineSeparator + "====================================== Start Time "
-                + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ======================================");
-        System.out.println("\r\n------------------------------------ Path Configuration ------------------------------------");
-        System.out.println("PathRawFile:          = " + pathRawData);
-        System.out.println("PathDecodeFile:       = " + pathDecodeData);
-        System.out.println("PathBackupRawFile:    = " + pathBackupRawFile);
-        System.out.println("PathLogFile:          = " + pathLogData);
-        System.out.println("PathBackupErrorFile:  = " + pathBackupRawFileError);
-        System.out.println("RawFileExtension:     = " + rawFileExtension);
-        System.out.println("CopyRawToBackup       = " + copyRawToBackup);
-        System.out.println("BackupWithGzip        = " + backupWithGzip);
-        System.out.println("DeleteOriginalRawFile = " + deleteOriginalRawFile);
-        System.out.println("RecordErrorCountLimit = " + recordErrorCountLimit);
+                + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ======================================" + lineSeparator);
+        System.out.println("------------------------------------ Path Configuration ------------------------------------");
+        System.out.println("PathRawFile                   = " + pathRawData);
+        System.out.println("PathDecodeFile                = " + pathDecodeFile);
+        System.out.println("PathDecodeFileError           = " + pathDecodeFileError);
+        System.out.println("PathDecodeDetailFile          = " + pathDecodeDetailFile);
+        System.out.println("PathBackupRawFile             = " + pathBackupRawFile);
+        System.out.println("PathLogFile                   = " + pathLogData);
+        System.out.println("PathBackupErrorFile           = " + pathBackupRawFileError);
+        System.out.println("FieldListFileName             = " + fieldListFileName);
+        System.out.println("RawFileExtension              = " + rawFileExtension);
+        System.out.println("CopyRawToBackup               = " + copyRawToBackup);
+        System.out.println("BackupWithGzip                = " + backupWithGzip);
+        System.out.println("DeleteOriginalRawFile         = " + deleteOriginalRawFile);
+        System.out.println("RecordErrorCountLimit         = " + recordErrorCountLimit);
+        System.out.println("CreateDetailTextFile          = " + createDetailTextFile);
+        System.out.println("CreateOutputSelectedFieldOnly = " + createOutputSelectedFieldOnly);
 
-        FileIO.createDirectory(pathDecodeData);
+        FileIO.createDirectory(pathDecodeFile);
+        FileIO.createDirectory(pathDecodeFileError);
+        FileIO.createDirectory(pathDecodeDetailFile);
         FileIO.createDirectory(pathBackupRawFile);
         FileIO.createDirectory(pathLogData);
         FileIO.createDirectory(pathBackupRawFileError);
 
-        List<String> arrayListFile = FileIO.ListFileByExtension(pathRawData, rawFileExtension);   // List RAW File from folder pathRawData
+        List<String> arrayListFile = FileIO.ListFileByExtension(pathRawData, rawFileExtension);   // List RAW File from folder pathRawData only define file extenion
+        
         String writeLogFileName = pathLogData + "LogDecoder.txt";
+        String writeFieldConfigFileName = pathLogData + "FieldConfig.txt";
 
         FileIO.FileWriter(writeLogFileName, true, lineSeparator + "====================================== Start Time "
                 + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ======================================" + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "\r\n------------------------------------ Path Configuration ------------------------------------" + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "PathRawFile:          = " + pathRawData + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "PathDecodeFile:       = " + pathDecodeData + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "PathBackupRawFile:    = " + pathBackupRawFile + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "PathLogFile:          = " + pathLogData + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "PathBackupErrorFile:  = " + pathBackupRawFileError + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "RawFileExtension:     = " + rawFileExtension + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "CopyRawToBackup       = " + copyRawToBackup + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "BackupWithGzip        = " + backupWithGzip + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "DeleteOriginalRawFile = " + deleteOriginalRawFile + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "RecordErrorCountLimit = " + recordErrorCountLimit + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, lineSeparator + "------------------------------------ Path Configuration ------------------------------------" + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "PathRawFile                    = " + pathRawData + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "PathDecodeFile                 = " + pathDecodeFile + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "PathDecodeFileError            = " + pathDecodeFileError + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "PathDecodeDetailFile           = " + pathDecodeDetailFile + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "PathBackupRawFile              = " + pathBackupRawFile + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "PathLogFile                    = " + pathLogData + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "PathBackupErrorFile            = " + pathBackupRawFileError + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "FieldListFileName              = " + fieldListFileName + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "RawFileExtension               = " + rawFileExtension + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "CopyRawToBackup                = " + copyRawToBackup + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "BackupWithGzip                 = " + backupWithGzip + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "DeleteOriginalRawFile          = " + deleteOriginalRawFile + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "RecordErrorCountLimit          = " + recordErrorCountLimit + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "CreateOutputSelectedFieldOnly  = " + createOutputSelectedFieldOnly + lineSeparator);        
         FileIO.FileWriter(writeLogFileName, true, lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "Total RAW File = " + arrayListFile.size() + lineSeparator);
 
         System.out.println(lineSeparator + "Total RAW File = " + arrayListFile.size());
 
-//############################################# Start loop for run all RAW file ####################################################
-//
+//################################################# Create Array Filed List ########################################################            
+//                 
+            int fieldCount = Integer.parseInt(readConfig[2]);
+            String[] arrayFieldList = new String[fieldCount + 2];       // array for store field list  //+2 for sumUplink_record, sumDownlink_record
+            arrayFieldList[0] = "sumDataUplink_record";                            // add Sum of record Data Uplink
+            arrayFieldList[1] = "sumDataDownlink_record";                          // add Sum of record Data Downlink
+            for (int i = 0; i < fieldCount; i++) {
+                arrayFieldList[i + 2] = readConfig[i + 3];
+//                System.out.println("arrayFieldList["+(i+2)+"]:"+arrayFieldList[i + 2]);     // Debug dump array field list
+            }
+ 
+//######################################## Create Array Filed List (Only Selected Field) ###########################################            
+//         
+//            *********************************
+////          **** map key with field name ****
+//            *********************************
+//            HashMap<String, String> mapFieldData = new HashMap<>();       //Create HashMap for store field data decoded
+//            mapFieldData.put(tag_1hex_str, field_decode_data);            // push to HashMapArray
+//            
+//            Iterator<String> Vmap = mapFieldData.keySet().iterator();         // Debug print (Tag) = (DecodeData)    
+//            while(Vmap.hasNext()){                                            // Debug print (Tag) = (DecodeData)
+//			String key = (String)(Vmap.next());  // Key             // Debug print (Tag) = (DecodeData)
+//			String val = mapFieldData.get(key); // Value            // Debug print (Tag) = (DecodeData)
+//			System.out.println(key + " = " + val);                  // Debug print (Tag) = (DecodeData)
+//		}             
+            
+//################ Create Array Field List (Only Enable Field & mapArray Filed List (FieldHexString = FieldName) ###################
+//         
+//            *********************************
+////          **** map key with field name ****
+//            *********************************
+//                
+            HashMap<String, String> mapHexString2FieldName = new HashMap<>();       //Create HashMap for store FieldString = FieldName
+            ArrayList<String> arrayListFieldEnableOnly = new ArrayList<>();       //Create Array for Store List of Field is not Skip (0=Skip, 1=Decode)
+            
+            mapHexString2FieldName.put("sumDataUplink_record","sumDataUplink_record");  //add mapField by manual (key="sumDataUplink_record",value="sumDataUplink_record")
+            mapHexString2FieldName.put("sumDataDownlink_record","sumDataDownlink_record");  //add mapField by manual (key="sumDataDownlink_record",value="sumDataDownlink_record")
+            arrayListFieldEnableOnly.add(0,"sumDataUplink_record");          //add field by manual (address 0)
+            arrayListFieldEnableOnly.add(1,"sumDataDownlink_record");        //add field by manual (address 1)
+            
+////############################ Create Field List Text File (For Map With Text File Output Decode Data) #############################
+////            
+//            String outputFieldList="";          // Field list for create text file (for map with decode data field)
+//            int fieldTotal=arrayFieldList.length;
+//            
+//            outputFieldList=outputFieldList+("========================="+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))
+//                    +"========================="+lineSeparator;
+//            outputFieldList=outputFieldList+"[ListAllField="+fieldTotal+"]"+lineSeparator;
+//            
+//            for(int i=0;i<fieldTotal;i++){
+//                        outputFieldList=outputFieldList+arrayFieldList[i]+"|";
+//                    }
+//            outputFieldList=outputFieldList+lineSeparator;
+//            
+//            
+//            
+//            fieldTotal=arrayListFieldEnableOnly.size();
+//            outputFieldList=outputFieldList+lineSeparator+"[ListEnableField="+fieldTotal+"]"+lineSeparator;
+//            for(int i=0;i<fieldTotal;i++){
+//                        outputFieldList=outputFieldList+arrayFieldList[i]+"|";
+//                    }
+//            outputFieldList=outputFieldList+lineSeparator+lineSeparator;
+//            
+//            String writeFieldListFileName=pathLogData+fieldListFileName;
+//            FileIO.FileWriter(writeFieldListFileName, true,outputFieldList);        // Write Text File "FieldList.txt"
+//            
+            
+            
+            
+//********************** Check may be not use this for loop *********************************************
+            
+            for(int i=2;i<(arrayFieldList.length-1);i++){             // 2=Skip(sumUpLink,sumDownLink) // -1=array is count from 0
+//            String fieldHexStr = arrayFieldList[i].substring(0,(arrayFieldList[i].indexOf(","))-1);
+                              
+            }
+//*******************************************************************************************************       
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+        int offsetPipeNext=fieldConfig.indexOf("|")+1;             //=fieldConfig.indexOf("|",0)+1;
+        int offsetPipeStart=0;
+        int fieldConfLen=fieldConfig.length();
+        int countField=1;                           // Debug Test
+        
+        for(int i=0;i<fieldConfLen;i++){
+        
+        String fieldConf = fieldConfig.substring(offsetPipeStart,offsetPipeNext-1);  //,(fieldConfig.indexOf("|",fieldConfig.indexOf("|")+1)));
+//        System.out.println("fieldConf"+countField+":"+fieldConf);                   //Debug Test
+        
+        int tagStart=0;
+        int tagEnd=fieldConf.indexOf(",");
+        String  tagHexStr = fieldConf.substring(tagStart,tagEnd);
+        tagStart=tagEnd+1;
+        tagEnd=fieldConf.indexOf(",",tagStart);
+        String  skipField = fieldConf.substring(tagStart,tagEnd);
+        tagStart=tagEnd+1;
+        tagEnd=fieldConf.indexOf(",",tagStart);
+        String  fieldName = fieldConf.substring(tagStart,tagEnd);
+       
+//  System.out.println(tagHexStr+"   "+skipField+"   "+fieldName);                                            // Debug
+       
+        mapHexString2FieldName.put(tagHexStr,fieldName);                    // push to HashMapArray
+        if(skipField.equals("1")){                                          // Check Skip or NotSkip (0=Skip,1=NotSkip)
+        arrayListFieldEnableOnly.add(tagHexStr);                                  // Add List of Field to Decode (Enable)
+        }
+        
+        offsetPipeStart=offsetPipeNext;
+        offsetPipeNext=fieldConfig.indexOf("|",offsetPipeStart)+1;
+        i=offsetPipeStart;
+//        countField++;                                                   // Debug Test
+        }
+        
+//        for(int i=0;i<arrayListFieldEnableOnly.size();i++){                   // Debug
+//            System.out.println(i+":"+arrayListFieldEnableOnly.get(i));        // Debug
+//        }                                                               // Debug
+        
+        
+//############################ Create Field List Text File (For Map With Text File Output Decode Data) #############################
+//          
+            String outputFieldList="";
+            String outputFieldListHex="";          // Field list for create text file (for map with decode data field)
+            String outputFieldListName="";
+            int fieldTotal=arrayFieldList.length;
+            
+            outputFieldList=outputFieldList+("======================="+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))+"======================="+lineSeparator;
+            outputFieldList=lineSeparator+outputFieldList+"[ListAllField="+fieldTotal+"]"+lineSeparator+lineSeparator;
+            
+            for(int i=0;i<fieldTotal;i++){
+                        outputFieldListHex=outputFieldListHex+arrayFieldList[i]+"|";
+                        outputFieldListName=outputFieldListName+mapHexString2FieldName.get(arrayFieldList[i])+"|";
+                    }
+            outputFieldList=outputFieldList+outputFieldListHex+lineSeparator;
+            outputFieldList=lineSeparator+outputFieldList+lineSeparator+outputFieldListName+lineSeparator+lineSeparator;
+            
+            
+            outputFieldListHex="";      // Clear Buffer
+            outputFieldListName="";     // Clear Buffer
+            fieldTotal=arrayListFieldEnableOnly.size();
+            
+            outputFieldList=outputFieldList+"----------------------------------------------------------------"+lineSeparator;
+            outputFieldList=outputFieldList+"[ListEnableField="+fieldTotal+"]"+lineSeparator+lineSeparator;
+            for(int i=0;i<fieldTotal;i++){
+                        outputFieldListHex=outputFieldListHex+arrayListFieldEnableOnly.get(i)+"|";
+                        outputFieldListName=outputFieldListName+mapHexString2FieldName.get(arrayListFieldEnableOnly.get(i))+"|";
+                    }
+            outputFieldList=outputFieldList+outputFieldListHex+lineSeparator+lineSeparator;
+            outputFieldList=outputFieldList+outputFieldListName+lineSeparator;
+            
+            outputFieldList=outputFieldList+"================================================================"+lineSeparator;
+            
+            String writeFieldListFileName=pathLogData+fieldListFileName;
+            FileIO.FileWriter(writeFieldListFileName, true,outputFieldList);        // Write Text File "FieldList.txt"
+  
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+           
+            
+//            Iterator<String> Vmap = mapHexString2FieldName.keySet().iterator();         // Debug print (Tag) = (DecodeData)
+//            int l=0;                                                                    // Debug print (Tag) = (DecodeData)
+//            while(Vmap.hasNext()){                                                      // Debug print (Tag) = (DecodeData)
+//			String key = (String)(Vmap.next());  // Key                     // Debug print (Tag) = (DecodeData)
+//			String val = mapHexString2FieldName.get(key); // Value          // Debug print (Tag) = (DecodeData)
+//			System.out.println(l+":"+key + " = " + val);                    // Debug print (Tag) = (DecodeData)
+//                        l++;                                                            // Debug print (Tag) = (DecodeData)
+//		}                                                                       // Debug print (Tag) = (DecodeData)
+            
+            
+//################################################# Create Global Variable #########################################################            
+// 
         int totalRawFile = arrayListFile.size();
         int rawFileErrorCount = 0;
         String listRawFileError = "";
         String rawFileErrorList = "";
         String backupRawDestination;
-
+        
+//############################################# Start loop for run all RAW file ####################################################
+//
         for (int rawFileNo = 0; rawFileNo < totalRawFile; rawFileNo++) {
+
+//---------------- Create Variable & array use in file decoder ------------------
             String fileName = arrayListFile.get(rawFileNo);
             String rawFilePathName = pathRawData + fileName;
             int notPGWCount = 0;                                        // Counter for Count Not PGW Record If Over Limit Skip To Next Raw File
-            ArrayList<String> arrayRecordData = new ArrayList<>();      //array for store record decode data before write to text file
-            int fieldCount = Integer.parseInt(readConfig[2]);
-            String[] arrayFieldList = new String[fieldCount + 2];       // array for store field list  //+2 for sumUplink, sumDownlink
-            arrayFieldList[0] = "sumUplink";
-            arrayFieldList[1] = "sumDownlink";
-            for (int i = 0; i < fieldCount; i++) {
-                arrayFieldList[i + 2] = readConfig[i + 3];
-            }
+            ArrayList<String> arrayRecordData = new ArrayList<>();      // Create ListArray for store record decode data before write to text file
+            ArrayList<String> arrayDetailDecodeData = new ArrayList<>();      // Create ListArray for store record decode data before write to text file
             int fileIndex = 0;
             String tag_1hex_str, tag_2hex_str, tag_3hex_str;
             int record_indx = 0;
@@ -156,6 +365,7 @@ public class PGW2TXT {
             String addressErrorList = "";
             String recordErrorList = "";    //use for add to integer for convert integer to string
             int sumRecordLength = 0;
+//            String detailDecodeData=""; // Buffer For Store Detail Decode Data
 
 //----------------------------- Start of log file ------------------------
             System.out.println(lineSeparator + "------------------------------------ (FileSeqNo:" + DecimalFormat.format((rawFileNo + 1)) + "/"
@@ -177,6 +387,7 @@ public class PGW2TXT {
 //------------------------- Start of loop file process -----------------------------------
             do {
                 record_decode_data = "";    // Reset Recodr data buffer
+//                String detailDecodeData=""; // Buffer For Store Detail Decode Data
                 String field_hex_str = "";  // Reset old record length
                 HashMap<String, String> mapFieldData = new HashMap<>();  //Create HashMap for store field data decoded
 
@@ -211,7 +422,7 @@ public class PGW2TXT {
                                 String field_conf = fieldConfig.substring(fieldConfig.indexOf(tag_1hex_str), tag_list_length);
                                 String field_decode = field_conf.substring(field_conf.indexOf(",") + 1, field_conf.indexOf(",") + 2);
                                 int field_length = rawFileInt[fileIndex];
-                                if ("1".equals(field_decode)) {
+                                if ((field_decode.equals("1"))|(tag_1hex_str.equals("xAC"))) {          // Check Field Config is Enable(=1) OR Field=xAC(List of traffic volume)
 
 //********** Special check for Tag [xAC x81 (x80...x83)] not found in manual **********
                                     if (("xAC".equals(tag_1hex_str)) && (rawFileInt[fileIndex] > 0x80) && (rawFileInt[fileIndex + 2] == 0x30)) {
@@ -248,8 +459,8 @@ public class PGW2TXT {
                                         record_decode_data = record_decode_data + tag_1hex_str + ":" + field_decode_data + "|";     //Test , Debug
                                     }
                                 } else {
-                                    fileIndex = fileIndex + field_length + 1;   // Skip file index to next field
-                                    record_indx = record_indx + field_length + 1;     // Add field_length to field_indx for correct field_indx position
+                                    fileIndex = fileIndex + field_length + 1;           // Skip file index to next field
+                                    record_indx = record_indx + field_length + 1;       // Add field_length to field_indx for correct field_indx position
                                 }
 //----------------------------- End of tag_1hex_str ---------------------------
 
@@ -309,6 +520,8 @@ public class PGW2TXT {
                                         }
                                     } else {
 //*************  Skip to next Record and count error **********
+                                        mapFieldData.put(tag_2hex_str, "UnknowTagField");  // push to HashMapArray
+                                        record_decode_data = record_decode_data + tag_1hex_str + ":" + "UnknowTagField" + "|";     //Test , Debug
                                         recordErrorCount++;
                                         recordErrorList = recordErrorList + recordCount + ",";
                                         addressErrorList = addressErrorList + "0x" + String.format("%02X", fileIndex) + ",";
@@ -316,8 +529,8 @@ public class PGW2TXT {
                                     }
                                 }
                             }
-                            mapFieldData.put("sumDataUplink_record", Double.toString(sumDataUplink_record));       // push to HashMapArray
-                            mapFieldData.put("sumDataDownlink_record", Double.toString(sumDataDownlink_record));   // push to HashMapArray
+                            mapFieldData.put("sumDataUplink_record", Long.toString(sumDataUplink_record));       // push to HashMapArray
+                            mapFieldData.put("sumDataDownlink_record", Long.toString(sumDataDownlink_record));   // push to HashMapArray
                         } while (fileIndex < sumRecordLength);
                     } catch (Exception ex) {
                         recordErrorCount++;
@@ -341,26 +554,196 @@ public class PGW2TXT {
                         recordErrorCount = recordErrorCount - recordErrorCountLimit;
                     }
                 }
-                recordCount++;
+//                recordCount++;
 
 //------***** Arrange dataDecode order by field list before write to array buffer (recordDataBuffer)  after that write from array (recordDataBuffer) to Text File
                 //------***** mapFieldData
-                int fieldTotal = arrayFieldList.length;
-                String recordFieldData = sumDataUplink_record + "|" + sumDataDownlink_record + "|";
+                
+                
+                
+                
+            if(createDetailTextFile.equals("YES")){
+                
+              if(createOutputSelectedFieldOnly.equals("NO")){           // Create Text Output All Field List (Include Blank Field)
+                
+                    fieldTotal = arrayFieldList.length;
+                    
+//                String recordFieldData = "";     //Create Variable and Assign Value
                 String getFieldData;
+                String keyValue;
+                    
+                arrayDetailDecodeData.add("========== StartRecord:"+recordCount+"==========");   //------ Create Text Detail Decode Data by Enable Field Config ----------
+                
                 for (int i = 0; i < fieldTotal; i++) {
                     getFieldData = mapFieldData.get(arrayFieldList[i]);
+                    
+                    keyValue=mapHexString2FieldName.get(arrayFieldList[i]);
+//                    arrayDetailDecodeData.add(keyValue+" = "+getFieldData);
+                    
+                    if (null != (getFieldData)) {
+//                        recordFieldData = recordFieldData + getFieldData + "|";
+                        arrayDetailDecodeData.add(keyValue+" = "+getFieldData);
+                    } else {
+//                        recordFieldData = recordFieldData + "|";
+                        arrayDetailDecodeData.add(keyValue+" =");
+                    }
+                }
+                
+                arrayDetailDecodeData.add("========== EndRecord:"+recordCount+"=========="+lineSeparator);
+                
+//                arrayRecordData.add(recordFieldData);   //write to array buffer before write to text file
+//                mapFieldData.clear();                   // Clear array buffer
+//                sumDataUplink_record = 0;               //Reset value
+//                sumDataDownlink_record = 0;             //Reset value
+                
+                }else{                                  // Create Text Output Only Selected Field List (Not Include Blank Field)
+                    fieldTotal = arrayListFieldEnableOnly.size();
+                    
+//                    for(int i=0;i<fieldTotal;i++){
+//                        outputFieldList=outputFieldList+arrayFieldList[i];
+//                    }
+                    
+//                    String recordFieldData="";     //Create Variable and Assign Value
+                    String getFieldData;
+                    String keyValue;
+                    
+                    arrayDetailDecodeData.add("========== StartRecord:"+recordCount+"==========");   //------ Create Text Detail Decode Data by Enable Field Config ----------
+                    
+                    for (int i = 0; i < fieldTotal; i++) {
+                    getFieldData = mapFieldData.get(arrayListFieldEnableOnly.get(i));   // +2Field for skip ==> sumDataUplink,sumDataDownLink
+                     
+                    keyValue=mapHexString2FieldName.get(arrayListFieldEnableOnly.get(i));
+//                    arrayDetailDecodeData.add(keyValue+" = "+getFieldData);
+                                   
+                                    if (null != (getFieldData)) {
+//                        recordFieldData = recordFieldData + getFieldData + "|";
+                                        arrayDetailDecodeData.add(keyValue+" = "+getFieldData);
+                    } else {
+//                        recordFieldData = recordFieldData + "|";
+                                        arrayDetailDecodeData.add(keyValue+" =");
+                    }
+                }
+                    arrayDetailDecodeData.add("========== EndRecord:"+recordCount+"=========="+lineSeparator);
+                    
+                    
+                    
+                    
+                    
+//                arrayRecordData.add(recordFieldData);   //write to array buffer before write to text file
+//                mapFieldData.clear();                   // Clear array buffer
+//                sumDataUplink_record = 0;               //Reset value
+//                sumDataDownlink_record = 0;             //Reset value
+//                
+               }   
+                
+                
+            }
+                
+//                
+//            Iterator<String> Vmap = mapFieldData.keySet().iterator();           // Debug print (Tag) = (DecodeData)
+//
+////            *********************************
+////          **** map key with field name ****
+////            *********************************
+//                System.out.println("----------- Record "+recordCount+" Detail --------------");      // Debug   
+//            while(Vmap.hasNext()){                                              // Debug print (Tag) = (DecodeData)
+//			String key = (String)(Vmap.next());  // Key             // Debug print (Tag) = (DecodeData)
+//                        String keyName=mapHexString2FieldName.get(key);
+//			String val = mapFieldData.get(key); // Value            // Debug print (Tag) = (DecodeData)
+//			System.out.println(keyName + " = " + val);                  // Debug print (Tag) = (DecodeData)
+//		}                                                               // Debug print (Tag) = (DecodeData)
+//                System.out.println("------------ Record End --------------");   // Debug
+//            }else{                                                              // Debug
+//                                                                                // Debug
+//            }                                                                   // Debug
+            
+            
+            
+//            recordCount++;
+            
+                
+                
+                
+                
+                
+//############################# Arange Data Order by Filed List Before Write to Text File ###############################
+//--------- Check Create Text Output Only Selected Field (Yes/No) ----------------
+//                
+//        String outputFieldList="";          // Field list for create text file (for map with decode data field)
+        
+                if(createOutputSelectedFieldOnly.equals("NO")){           // Create Text Output All Field List (Include Blank Field)
+                
+                    fieldTotal = arrayFieldList.length;
+                    
+//                    for(int i=0;i<fieldTotal;i++){
+//                        outputFieldList=outputFieldList+arrayFieldList[i];
+//                    }
+                    
+                String recordFieldData = "";     //Create Variable and Assign Value
+                String getFieldData;
+//                String keyValue;
+                    
+//                arrayDetailDecodeData.add("========== StartRecord:"+recordCount+"==========");   //------ Create Text Detail Decode Data by Enable Field Config ----------
+                
+                for (int i = 0; i < fieldTotal; i++) {
+                    getFieldData = mapFieldData.get(arrayFieldList[i]);
+                    
+//                    keyValue=mapHexString2FieldName.get(arrayFieldList[i]);
+//                    arrayDetailDecodeData.add(keyValue+" = "+getFieldData);
+                    
                     if (null != (getFieldData)) {
                         recordFieldData = recordFieldData + getFieldData + "|";
                     } else {
                         recordFieldData = recordFieldData + "|";
                     }
                 }
+                
+//                arrayDetailDecodeData.add("========== EndRecord:"+recordCount+"=========="+lineSeparator);
+                
                 arrayRecordData.add(recordFieldData);   //write to array buffer before write to text file
                 mapFieldData.clear();                   // Clear array buffer
                 sumDataUplink_record = 0;               //Reset value
                 sumDataDownlink_record = 0;             //Reset value
-            } while ((fileIndex + 1) < fileLength);     // +1Byet for adjust length (protect array out of bound)
+                }else{                                  // Create Text Output Only Selected Field List (Not Include Blank Field)
+                    fieldTotal = arrayListFieldEnableOnly.size();
+                    
+//                    for(int i=0;i<fieldTotal;i++){
+//                        outputFieldList=outputFieldList+arrayFieldList[i];
+//                    }
+                    
+                    String recordFieldData="";     //Create Variable and Assign Value
+                    String getFieldData;
+//                    String keyValue;
+                    
+//                    arrayDetailDecodeData.add("========== StartRecord:"+recordCount+"==========");   //------ Create Text Detail Decode Data by Enable Field Config ----------
+                    
+                    for (int i = 0; i < fieldTotal; i++) {
+                    getFieldData = mapFieldData.get(arrayListFieldEnableOnly.get(i));   // +2Field for skip ==> sumDataUplink,sumDataDownLink
+                     
+//                    keyValue=mapHexString2FieldName.get(arrayListFieldEnableOnly.get(i));
+//                    arrayDetailDecodeData.add(keyValue+" = "+getFieldData);
+                                   
+                                    if (null != (getFieldData)) {
+                        recordFieldData = recordFieldData + getFieldData + "|";
+                    } else {
+                        recordFieldData = recordFieldData + "|";
+                    }
+                }
+//                    arrayDetailDecodeData.add("========== EndRecord:"+recordCount+"=========="+lineSeparator);
+                    
+                    
+                    
+                    
+                    
+                arrayRecordData.add(recordFieldData);   //write to array buffer before write to text file
+                mapFieldData.clear();                   // Clear array buffer
+                sumDataUplink_record = 0;               //Reset value
+                sumDataDownlink_record = 0;             //Reset value
+//                
+               }
+                recordCount++;          // End of Record Loop
+                
+            } while ((fileIndex + 1) < fileLength);     // +1Byet for adjust length (protect array out of bound)    // End of File Loop
 
 //----------------- End of File Summarry Report -------------------
             sumRecord_allFile = sumRecord_allFile + (recordCount - 1);
@@ -388,20 +771,24 @@ public class PGW2TXT {
             } else {
                 backupRawDestination = pathBackupRawFile + fileName;            // Save Backup RAW File To == > PathBackupRawFile
             }
-            String writeFileName = pathDecodeData + fileName + ".txt";
+            String writeDecodeFileName = pathDecodeFile + fileName + ".txt";
+            String writeDecodeDetailFileName = pathDecodeDetailFile+fileName+"_detail.txt";
 
 //------------ Check Folder Existing Before Write File ------------------------
-            File pathTextData = new File(pathDecodeData);
+            File pathTextData = new File(pathDecodeFile);
             if (pathTextData.exists()) {
-                FileIO.bufferWriter(writeFileName, arrayRecordData);     // Write output to text file
+                FileIO.bufferWriter(writeDecodeFileName, arrayRecordData);     // Write output to text file
+                if(createDetailTextFile.equals("YES")){
+                    FileIO.bufferWriter(writeDecodeDetailFileName, arrayDetailDecodeData);     // Write output Detail Decode Data to text file
+                }
             } else {
-                System.out.println("Directory " + pathDecodeData + " Not exists !!!");
+                System.out.println("Directory " + pathDecodeFile + " Not exists !!!");
             }
 
-            File textData = new File(writeFileName);
+            File textData = new File(writeDecodeFileName);
             if (textData.exists()) {
             } else {
-                System.out.println("Directory " + pathDecodeData + " Not exists !!!");
+                System.out.println("Directory " + pathDecodeFile + " Not exists !!!");
             }
 
 //------------------------------------- Backup Original RAW File --------------------------------------------
