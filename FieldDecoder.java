@@ -80,7 +80,6 @@ public class FieldDecoder {
                 String sub_field_type;
                 String sub_field_list = "x80|x81|x82|x83|";
                 int field_len = field_raw_data.length;
-//                int remain_raw_xA6 = field_len;
                 int sub_field_len;
                 field_decode_data = "{";
 
@@ -120,13 +119,13 @@ public class FieldDecoder {
 
 //---------------------- Start of case x88 (pdpPDNType) ----------------------
             case "x88":
-                field_decode_data = DataConverter.Int2HexString(field_raw_data);   // Octet String
+                field_decode_data = DataConverter.Int2HexString(field_raw_data);
                 return field_decode_data;
 //---------------------- End of case x88 ----------------------
 
 //---------------------- Start of case x8D (recordOpeningTime) ----------------------
             case "x8D":
-                field_decode_data = DataConverter.Int2DateTime(field_raw_data);   // Octet String
+                field_decode_data = DataConverter.Int2DateTime(field_raw_data);
                 return field_decode_data;
 //---------------------- End of case x88 ----------------------
 
@@ -152,8 +151,6 @@ public class FieldDecoder {
 
 //---------------------- Start of case xA9 (servedPDPPDNAddress) ----------------------
             case "xA9":
-//                int field_raw_length = field_raw_data.length;
-
                 if (field_raw_data[0] == 0xA0) {        // iPAddress
                     int sub_field_length = field_raw_data[1];
                     int[] sub_field_raw_data = new int[sub_field_length];
@@ -247,7 +244,7 @@ public class FieldDecoder {
                 int[] servedMSISDN_int = new int[field_raw_data.length];
                 if (field_raw_data.length == 7) {
                     for (int i = 0; i < 6; i++) {
-                        servedMSISDN_int[i] = field_raw_data[i + 1];  // Delete First Byte (91)
+                        servedMSISDN_int[i] = field_raw_data[i + 1];                    // Delete First Byte (91)
                     }
                     field_decode_data = DataConverter.tBCD2String(servedMSISDN_int);
                 } else {

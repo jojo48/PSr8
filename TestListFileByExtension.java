@@ -174,7 +174,7 @@ import java.util.List;
 // 
 //}
 //
-//public class ListFileByExtension {
+//public class TestListFileByExtension {
 // 
 //    private static final String FILE_DIR = "D:/Training/Java/SourceCode/cdr/cdr_raw_PS_R8";
 //    private static final String FILE_TEXT_EXT = ".cdr";
@@ -183,7 +183,7 @@ import java.util.List;
 ////     * @param args
 ////     */
 //    public static void main(String args[]) {
-//        new ListFileByExtension().listFile(FILE_DIR, FILE_TEXT_EXT);
+//        new TestListFileByExtension().listFile(FILE_DIR, FILE_TEXT_EXT);
 //    }
 // 
 //    public void listFile(String folder, String ext) {
@@ -256,7 +256,7 @@ import java.util.List;
 
 
 
-public class ListFileByExtension {
+public class TestListFileByExtension {
  
     private static final String FILE_DIR = "D:/Training/Java/SourceCode/cdr/cdr_raw_PS_R8";
     private static final String FILE_EXT = ".cdr";
@@ -265,7 +265,7 @@ public class ListFileByExtension {
 //     * @param args
 //     */
     public static void main(String args[]) {
-//        new ListFileByExtension().listFile(FILE_DIR, FILE_TEXT_EXT);
+//        new TestListFileByExtension().listFile(FILE_DIR, FILE_TEXT_EXT);
         
         FileIO FileIO = new FileIO();
         List<String> arrayListFile=FileIO.ListFileByExtension(FILE_DIR, FILE_EXT);

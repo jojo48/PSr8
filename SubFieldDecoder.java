@@ -16,13 +16,10 @@ class SubFieldDecoder {
 
     String decode_xAC_x30(int[] raw_xAC_x30) {
         decode_data_xAC_x30_sub = "";
-//        String subTAG_xAC_30 = "x" + String.format("%02X", raw_xAC_x30[0]);
-
         int raw_xAC_x30_len = raw_xAC_x30.length;
         int xAC_x30_sub1_len;
         for (int xAC_x30_indx = 0; xAC_x30_indx < raw_xAC_x30_len; xAC_x30_indx++) {
             xAC_x30_sub1_len = raw_xAC_x30[xAC_x30_indx + 1];
-
             int[] raw_xAC_x30_sub1 = new int[xAC_x30_sub1_len + 2];
             for (int i = 0; i < (xAC_x30_sub1_len + 2); i++) {
                 raw_xAC_x30_sub1[i] = raw_xAC_x30[xAC_x30_indx];
@@ -37,12 +34,10 @@ class SubFieldDecoder {
     }
 
     String xAC_x30_decode(int[] raw_xAC_x30_sub) {
-        
-        Main_PGW Main_PGW = new Main_PGW();     // Create Object Main_PGW
-        PGW2TXT PGW2TXT =new PGW2TXT();
-        
-        int raw_xAC_x30_sub_len = raw_xAC_x30_sub.length;
 
+        Test_Main_PGW Main_PGW = new Test_Main_PGW();                     // Create Object Test_Main_PGW
+        PGW2TXT PGW2TXT = new PGW2TXT();
+        int raw_xAC_x30_sub_len = raw_xAC_x30_sub.length;
         int[] raw_xAC_x30_sub1 = new int[raw_xAC_x30_sub_len - 2];
         for (int i = 0; i < (raw_xAC_x30_sub_len - 2); i++) {
             raw_xAC_x30_sub1[i] = raw_xAC_x30_sub[i + 2];
@@ -54,57 +49,56 @@ class SubFieldDecoder {
             case "x81":
                 decode_data_xAC_x30_sub = DataConverter.Int2HexString(raw_xAC_x30_sub1);
                 return decode_data_xAC_x30_sub;
-//--------------------------------- End x81 ---------------------------------//--------------------------------- End x81 ---------------------------------
+//--------------------------------- End x81 ---------------------------------
 
 //--------------------------------- Start x82 ---------------------------------
             case "x82":
                 decode_data_xAC_x30_sub = DataConverter.Int2HexString(raw_xAC_x30_sub1);
                 return decode_data_xAC_x30_sub;
-//--------------------------------- End x82 ---------------------------------//--------------------------------- End x82 ---------------------------------
+//--------------------------------- End x82 ---------------------------------
 
 //--------------------------------- Start x83 (dataVolumeMBMSUplink) ---------------------------------
             case "x83":
-                long dataVolumeUplink=DataConverter.hexString2int(DataConverter.Int2HexString(raw_xAC_x30_sub1)); 
+                long dataVolumeUplink = DataConverter.hexString2int(DataConverter.Int2HexString(raw_xAC_x30_sub1));
                 Main_PGW.DataUplink(dataVolumeUplink);  //Sum data volume uplink
                 PGW2TXT.DataUplink(dataVolumeUplink);
                 decode_data_xAC_x30_sub = "dataVolumeUplink:" + Long.toString(dataVolumeUplink);
                 return decode_data_xAC_x30_sub;
-//--------------------------------- End x83 ---------------------------------//--------------------------------- End x83 ---------------------------------
+//--------------------------------- End x83 ---------------------------------
 
 //--------------------------------- Start x84 (dataVolumeMBMSDownlink) ---------------------------------
             case "x84":
-                long dataVolumeDownlink=DataConverter.hexString2int(DataConverter.Int2HexString(raw_xAC_x30_sub1));
+                long dataVolumeDownlink = DataConverter.hexString2int(DataConverter.Int2HexString(raw_xAC_x30_sub1));
                 Main_PGW.DataDownlink(dataVolumeDownlink);  //Sum data volume downlink
                 PGW2TXT.DataDownlink(dataVolumeDownlink);
-               decode_data_xAC_x30_sub = "dataVolumeDownlink:" + Long.toString(dataVolumeDownlink);
-               
+                decode_data_xAC_x30_sub = "dataVolumeDownlink:" + Long.toString(dataVolumeDownlink);
                 return decode_data_xAC_x30_sub;
-//--------------------------------- End x84 ---------------------------------//--------------------------------- End x84 ---------------------------------
+//--------------------------------- End x84 ---------------------------------
 
 //--------------------------------- Start x85 (changeCondition) ---------------------------------
             case "x85":
                 decode_data_xAC_x30_sub = "changeCondition:" + Integer.toString(DataConverter.hexString2int(DataConverter.Int2HexString(raw_xAC_x30_sub1)));
                 return decode_data_xAC_x30_sub;
-//--------------------------------- End x85 ---------------------------------//--------------------------------- End x85 ---------------------------------
+//--------------------------------- End x85 ---------------------------------
 
 //--------------------------------- Start x86 (changeTime) ---------------------------------
             case "x86":
                 decode_data_xAC_x30_sub = "changeTime:" + DataConverter.Int2DateTime(raw_xAC_x30_sub1);
                 return decode_data_xAC_x30_sub;
-//--------------------------------- End x86 ---------------------------------//--------------------------------- End x86 ---------------------------------
+//--------------------------------- End x86 ---------------------------------
 
 //--------------------------------- Start x87 ---------------------------------
             case "x87":
                 decode_data_xAC_x30_sub = DataConverter.Int2HexString(raw_xAC_x30_sub1);
                 return decode_data_xAC_x30_sub;
-//--------------------------------- End x87 ---------------------------------//--------------------------------- End x87 ---------------------------------
+//--------------------------------- End x87 ---------------------------------
 
 //--------------------------------- Start x88 ---------------------------------
             case "x88":
-                decode_data_xAC_x30_sub=userLocInfo(raw_xAC_x30_sub1);
+                decode_data_xAC_x30_sub = userLocInfo(raw_xAC_x30_sub1);
 //                decode_data_xAC_x30_sub = DataConverter.Int2HexString(raw_xAC_x30_sub1);
                 return decode_data_xAC_x30_sub;
-//--------------------------------- End x88 ---------------------------------//--------------------------------- End x88 ---------------------------------
+//--------------------------------- End x88 ---------------------------------
 
 //--------------------------------- Start xA9 (ePCQoSInformation) ---------------------------------
             case "xA9":
@@ -192,7 +186,7 @@ class SubFieldDecoder {
         String ci_hex_str = "0x" + String.format("%02X", raw_loc_info[6]) + String.format("%02X", raw_loc_info[7]);
 
         if (raw_loc_info.length == 8) {
-            if (raw_loc_info[0] == 0) {    // 0=CGI =>(PLMN+LAC+CI) ; 1=SAI =>(PLMN+LAC+SAC)
+            if (raw_loc_info[0] == 0) {        // 0=CGI =>(PLMN+LAC+CI) ; 1=SAI =>(PLMN+LAC+SAC)
                 decode_user_loc_info = "PLMN:" + DataConverter.tBCD2String(plmn_raw) + " LAC:" + Integer.toString(DataConverter.hexString2int(lac_hex_str))
                         + " CI:" + Integer.toString(DataConverter.hexString2int(ci_hex_str));
             } else {

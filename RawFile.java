@@ -15,14 +15,14 @@ class RawFile {
         {
             int rdInt;
             int fileLength = inputStream.available();
-            int[] intArrayBuffer = new int[fileLength + 1]; //Create Array for store Integer Data
+            int[] intArrayBuffer = new int[fileLength + 1];     //Create Array for store Integer Data
 
             for (int indx = 0; indx <= fileLength; indx++) {
                 rdInt = inputStream.read();         //Read one byte
                 intArrayBuffer[indx] = rdInt;       // Store to array
             }
-            inputStream.close(); //add command close inputStream
-            return intArrayBuffer;  //Returen File Value Array (Integer)
+            inputStream.close();        //add command close inputStream
+            return intArrayBuffer;      //Returen File Value Array (Integer)
         }
     }
     

@@ -17,22 +17,18 @@ public class DataConverter {
             hexString = hexString + String.format("%02X", rawInt2HexString[i]);
         }
         return hexString;
-
     }
 
     public int hexString2int(String hex_str) {
         int int_val;
-//        hex_str = "0x" + hex_str;   //add prefix Hex String
         int_val = Integer.decode(hex_str);
         return int_val;
-
     }
 
     public String tBCD2String(int[] rawInt2String) {
         String tBCDstring = "";
         for (int i = 0; i < rawInt2String.length; i++) {
             String rawByteHexString = String.format("%02X", rawInt2String[i]);
-
             if (!"FF".equals(rawByteHexString)) {
                 if (!"F".equals(rawByteHexString.substring(0, 1))) {
                     tBCDstring = tBCDstring + rawByteHexString.substring(1, 2);
@@ -68,7 +64,6 @@ public class DataConverter {
                 }
                 ip_decode_data = IPv4String(tag_raw_data);
                 return ip_decode_data;
-
             case "x81":
                 ip_decode_data = Int2HexString(rawInt2IP);
                 return ip_decode_data;
@@ -82,7 +77,6 @@ public class DataConverter {
                 ip_decode_data = "unknow subTAG: " + Int2HexString(rawInt2IP);
                 return ip_decode_data;
         }
-
     }
 
     public String IA5String(int[] rawInt2String) {
