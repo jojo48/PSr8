@@ -53,7 +53,8 @@ public class PGW2TXT {
         DecimalFormat DecimalFormat = new DecimalFormat("#,###,##0");
 
         FileIO FileIO = new FileIO();
-        String pathFileConfig = "D:\\Training\\Java\\SourceCode\\pgw\\PGWr8_1.csv";
+//        String pathFileConfig = "D:\\Training\\Java\\SourceCode\\pgw\\PGWr8_1.csv";
+        String pathFileConfig=args[0];              // Get Config File
         String fieldListFileName = "FieldList.txt";                                 // Create Field List (Text File) will use for map with Decode file
         String[] readConfig = FileIO.ReadFileConfig(pathFileConfig);                // Return with array of header group
         String pathConfig = readConfig[0];                                          // Array readConfig address 0 = String of Path Configuration
