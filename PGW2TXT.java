@@ -53,8 +53,8 @@ public class PGW2TXT {
         DecimalFormat DecimalFormat = new DecimalFormat("#,###,##0");
 
         FileIO FileIO = new FileIO();
-        String pathFileConfig = "D:\\Training\\Java\\SourceCode\\pgw\\PGWr8.csv";
-        String fieldListFileName = "FieldList.txt";
+        String pathFileConfig = "D:\\Training\\Java\\SourceCode\\pgw\\PGWr8_1.csv";
+        String fieldListFileName = "FieldList.txt";                     // Create Field List (Text File) will use for map with Decode file
         String[] readConfig = FileIO.ReadFileConfig(pathFileConfig);    // Return with array of header group
         String pathConfig = readConfig[0];                                  // Array readConfig address 0 = String of Path Configuration
         String fieldConfig = readConfig[1];                                 // Array readConfig address 1 = String of Tag Field list
@@ -82,67 +82,75 @@ public class PGW2TXT {
         } while (pathConfig_indxEnd + 1 < pathConfig.length());
 
         String pathRawData = listPathConfig.get("RawFile");
-        String pathDecodeFile = listPathConfig.get("DecodeFile");
+        String pathDecodePipeFile = listPathConfig.get("DecodePipeFile");
+        String pathDecodeDetailFile = listPathConfig.get("DecodeDetailFile");
         String pathDecodeFileError = listPathConfig.get("DecodeFileError");
         String pathBackupRawFile = listPathConfig.get("BackupRawFile");
-        String pathLogData = listPathConfig.get("LogFile");
         String pathBackupRawFileError = listPathConfig.get("BackupRawFileError");
-        String pathDecodeDetailFile = listPathConfig.get("DecodeDetailFile");
+        String pathLogData = listPathConfig.get("LogFile");
         String rawFileExtension = listPathConfig.get("RawFileExtension");
         String copyRawToBackup = (listPathConfig.get("CopyRawToBackup")).toUpperCase();
         String backupWithGzip = (listPathConfig.get("BackupWithGzip")).toUpperCase();
         String deleteOriginalRawFile = (listPathConfig.get("DeleteOriginalRawFile")).toUpperCase();
-        String createDetailTextFile = (listPathConfig.get("CreateDetailTextFile")).toUpperCase();
+        String createPipeTextFile = (listPathConfig.get("CreatePipeTextFile")).toUpperCase();                       // use for import to DB or Excel
+        String createDetailTextFile = (listPathConfig.get("CreateDetailTextFile")).toUpperCase();                   // use for analyze detail
         String createOutputSelectedFieldOnly = (listPathConfig.get("CreateOutputSelectedFieldOnly")).toUpperCase();
         int recordErrorCountLimit = Integer.parseInt(listPathConfig.get("RecordErrorCountLimit"));
+        
+        String writeLogFileName = pathLogData + "LogDecoder.txt";
+        String writeFieldConfigFileName = pathLogData + "FieldConfig.txt";
+        List<String> arrayListFile = FileIO.ListFileByExtension(pathRawData, rawFileExtension);   // List RAW File from folder pathRawData only define file extenion
 
         System.out.println(lineSeparator + "====================================== Start Time "
                 + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ======================================" + lineSeparator);
         System.out.println("------------------------------------ Path Configuration ------------------------------------");
         System.out.println("PathRawFile                   = " + pathRawData);
-        System.out.println("PathDecodeFile                = " + pathDecodeFile);
-        System.out.println("PathDecodeFileError           = " + pathDecodeFileError);
+        System.out.println("PathDecodePipeFile            = " + pathDecodePipeFile);
         System.out.println("PathDecodeDetailFile          = " + pathDecodeDetailFile);
+        System.out.println("PathDecodeFileError           = " + pathDecodeFileError);
         System.out.println("PathBackupRawFile             = " + pathBackupRawFile);
-        System.out.println("PathLogFile                   = " + pathLogData);
         System.out.println("PathBackupErrorFile           = " + pathBackupRawFileError);
-        System.out.println("FieldListFileName             = " + fieldListFileName);
+        System.out.println("PathLogFile                   = " + pathLogData);
+        System.out.println("FieldListFileName             = " + fieldListFileName);             // Create Field List (Text File) will use for map with Decode file
         System.out.println("RawFileExtension              = " + rawFileExtension);
         System.out.println("CopyRawToBackup               = " + copyRawToBackup);
         System.out.println("BackupWithGzip                = " + backupWithGzip);
         System.out.println("DeleteOriginalRawFile         = " + deleteOriginalRawFile);
         System.out.println("RecordErrorCountLimit         = " + recordErrorCountLimit);
+        System.out.println("CreatePipeTextFile            = " + createPipeTextFile);
         System.out.println("CreateDetailTextFile          = " + createDetailTextFile);
         System.out.println("CreateOutputSelectedFieldOnly = " + createOutputSelectedFieldOnly);
 
-        FileIO.createDirectory(pathDecodeFile);
-        FileIO.createDirectory(pathDecodeFileError);
+        FileIO.createDirectory(pathDecodePipeFile);
         FileIO.createDirectory(pathDecodeDetailFile);
+        FileIO.createDirectory(pathDecodeFileError);
         FileIO.createDirectory(pathBackupRawFile);
-        FileIO.createDirectory(pathLogData);
         FileIO.createDirectory(pathBackupRawFileError);
+        FileIO.createDirectory(pathLogData);
 
-        List<String> arrayListFile = FileIO.ListFileByExtension(pathRawData, rawFileExtension);   // List RAW File from folder pathRawData only define file extenion
-        
-        String writeLogFileName = pathLogData + "LogDecoder.txt";
-        String writeFieldConfigFileName = pathLogData + "FieldConfig.txt";
+//        List<String> arrayListFile = FileIO.ListFileByExtension(pathRawData, rawFileExtension);   // List RAW File from folder pathRawData only define file extenion
+//        
+//        String writeLogFileName = pathLogData + "LogDecoder.txt";
+//        String writeFieldConfigFileName = pathLogData + "FieldConfig.txt";
 
         FileIO.FileWriter(writeLogFileName, true, lineSeparator + "====================================== Start Time "
                 + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ======================================" + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, lineSeparator + "------------------------------------ Path Configuration ------------------------------------" + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "PathRawFile                    = " + pathRawData + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "PathDecodeFile                 = " + pathDecodeFile + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "PathDecodeFileError            = " + pathDecodeFileError + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "PathDecodePipeFile             = " + pathDecodePipeFile + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "PathDecodeDetailFile           = " + pathDecodeDetailFile + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "PathDecodeFileError            = " + pathDecodeFileError + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "PathBackupRawFile              = " + pathBackupRawFile + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "PathLogFile                    = " + pathLogData + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "PathBackupErrorFile            = " + pathBackupRawFileError + lineSeparator);
-        FileIO.FileWriter(writeLogFileName, true, "FieldListFileName              = " + fieldListFileName + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "PathLogFile                    = " + pathLogData + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "FieldListFileName              = " + fieldListFileName + lineSeparator);  // Create Field List (Text File) will use for map with Decode file
         FileIO.FileWriter(writeLogFileName, true, "RawFileExtension               = " + rawFileExtension + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "CopyRawToBackup                = " + copyRawToBackup + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "BackupWithGzip                 = " + backupWithGzip + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "DeleteOriginalRawFile          = " + deleteOriginalRawFile + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "RecordErrorCountLimit          = " + recordErrorCountLimit + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "CreatePipeTextFile             = " + createPipeTextFile + lineSeparator);
+        FileIO.FileWriter(writeLogFileName, true, "CreateDetailTextFile           = " + createDetailTextFile + lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "CreateOutputSelectedFieldOnly  = " + createOutputSelectedFieldOnly + lineSeparator);        
         FileIO.FileWriter(writeLogFileName, true, lineSeparator);
         FileIO.FileWriter(writeLogFileName, true, "Total RAW File = " + arrayListFile.size() + lineSeparator);
@@ -422,7 +430,7 @@ public class PGW2TXT {
                                 String field_conf = fieldConfig.substring(fieldConfig.indexOf(tag_1hex_str), tag_list_length);
                                 String field_decode = field_conf.substring(field_conf.indexOf(",") + 1, field_conf.indexOf(",") + 2);
                                 int field_length = rawFileInt[fileIndex];
-                                if ((field_decode.equals("1"))|(tag_1hex_str.equals("xAC"))) {          // Check Field Config is Enable(=1) OR Field=xAC(List of traffic volume)
+                                if ((field_decode.equals("1"))|(createOutputSelectedFieldOnly.equals("NO"))|(tag_1hex_str.equals("xAC"))) {          // Check Field Config is Enable(=1) OR Field=xAC(List of traffic volume)
 
 //********** Special check for Tag [xAC x81 (x80...x83)] not found in manual **********
                                     if (("xAC".equals(tag_1hex_str)) && (rawFileInt[fileIndex] > 0x80) && (rawFileInt[fileIndex + 2] == 0x30)) {
@@ -474,7 +482,7 @@ public class PGW2TXT {
                                     String field_conf = fieldConfig.substring(fieldConfig.indexOf(tag_2hex_str), tag_list_length);
                                     String field_decode = field_conf.substring(field_conf.indexOf(",") + 1, field_conf.indexOf(",") + 2);
                                     int field_length = rawFileInt[fileIndex];
-                                    if ("1".equals(field_decode)) {
+                                    if ((field_decode.equals("1"))|(createOutputSelectedFieldOnly.equals("NO"))) {
                                         int[] field_raw_int = new int[field_length]; // Array for field raw data interger
                                         fileIndex++;
                                         record_indx++;
@@ -502,7 +510,7 @@ public class PGW2TXT {
                                         String field_conf = fieldConfig.substring(fieldConfig.indexOf(tag_3hex_str), tag_list_length);
                                         String field_decode = field_conf.substring(field_conf.indexOf(",") + 1, field_conf.indexOf(",") + 2);
                                         int field_length = rawFileInt[fileIndex];
-                                        if ("1".equals(field_decode)) {
+                                        if ((field_decode.equals("1"))|(createOutputSelectedFieldOnly.equals("NO"))) {
                                             int[] field_raw_int = new int[field_length]; // Array for field raw data interger
                                             fileIndex++;
                                             record_indx++;
@@ -771,24 +779,26 @@ public class PGW2TXT {
             } else {
                 backupRawDestination = pathBackupRawFile + fileName;            // Save Backup RAW File To == > PathBackupRawFile
             }
-            String writeDecodeFileName = pathDecodeFile + fileName + ".txt";
+            String writeDecodeFileName = pathDecodePipeFile + fileName + ".txt";
             String writeDecodeDetailFileName = pathDecodeDetailFile+fileName+"_detail.txt";
 
 //------------ Check Folder Existing Before Write File ------------------------
-            File pathTextData = new File(pathDecodeFile);
+            File pathTextData = new File(pathDecodePipeFile);
             if (pathTextData.exists()) {
+                if(createPipeTextFile.equals("YES")){
                 FileIO.bufferWriter(writeDecodeFileName, arrayRecordData);     // Write output to text file
+                }
                 if(createDetailTextFile.equals("YES")){
                     FileIO.bufferWriter(writeDecodeDetailFileName, arrayDetailDecodeData);     // Write output Detail Decode Data to text file
                 }
             } else {
-                System.out.println("Directory " + pathDecodeFile + " Not exists !!!");
+                System.out.println("Directory " + pathDecodePipeFile + " Not exists !!!");
             }
 
             File textData = new File(writeDecodeFileName);
             if (textData.exists()) {
             } else {
-                System.out.println("Directory " + pathDecodeFile + " Not exists !!!");
+                System.out.println("Directory " + pathDecodePipeFile + " Not exists !!!");
             }
 
 //------------------------------------- Backup Original RAW File --------------------------------------------
