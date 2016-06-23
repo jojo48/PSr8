@@ -285,7 +285,7 @@ public class PGW2TXT {
 
 //------------------------- Start of loop record process ------------------------
                 String record_type_hex_str = String.format("%02X", rawFileInt[fileIndex]) + String.format("%02X", rawFileInt[fileIndex + 1]);
-                if ("BF4F".equals(record_type_hex_str)) {
+                if ("BF4F".equals(record_type_hex_str)) {                   // Check Start TAG = BF4F (PGW-Record)
                     notPGWCount = 0;                                            // Reset Record Error Counter
                     fileIndex = fileIndex + 2;
                     sumRecordLength = sumRecordLength + 2;
