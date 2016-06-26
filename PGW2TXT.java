@@ -259,6 +259,7 @@ public class PGW2TXT {
             String addressErrorList = "";
             String recordErrorList = "";        //use for add to integer for convert integer to string
             int sumRecordLength = 0;
+            String recordStartAddress;
 
 //----------------------------- Start of log file ------------------------
             System.out.println(lineSeparator + "------------------------------------ (FileSeqNo:" + DecimalFormat.format((rawFileNo + 1)) + "/"
@@ -284,6 +285,7 @@ public class PGW2TXT {
                 HashMap<String, String> mapFieldData = new HashMap<>();     //Create HashMap for store field data decoded
 
 //------------------------- Start of loop record process ------------------------
+                recordStartAddress="0x"+String.format("%02X",fileIndex);
                 String record_type_hex_str = String.format("%02X", rawFileInt[fileIndex]) + String.format("%02X", rawFileInt[fileIndex + 1]);
                 if ("BF4F".equals(record_type_hex_str)) {                   // Check Start TAG = BF4F (PGW-Record)
                     notPGWCount = 0;                                            // Reset Record Error Counter
@@ -454,7 +456,7 @@ public class PGW2TXT {
                         fieldTotal = arrayFieldList.length;
                         String getFieldData;
                         String keyValue;
-                        arrayDetailDecodeData.add("========== StartRecord:" + recordCount + "==========");  //-- Create Text Detail Decode Data by Enable Field Config --
+                        arrayDetailDecodeData.add("========== StartRecord:" + recordCount + "(Address:"+recordStartAddress+")==========");  //-- Create Text Detail Decode Data by Enable Field Config --
                         for (int i = 0; i < fieldTotal; i++) {
                             getFieldData = mapFieldData.get(arrayFieldList[i]);
                             keyValue = mapHexString2FieldName.get(arrayFieldList[i]);
@@ -469,7 +471,7 @@ public class PGW2TXT {
                         fieldTotal = arrayListFieldEnableOnly.size();
                         String getFieldData;
                         String keyValue;
-                        arrayDetailDecodeData.add("========== StartRecord:" + recordCount + "==========");  //-- Create Text Detail Decode Data by Enable Field Config --
+                        arrayDetailDecodeData.add("========== StartRecord:" + recordCount + "(Address:"+recordStartAddress+")==========");  //-- Create Text Detail Decode Data by Enable Field Config --
                         for (int i = 0; i < fieldTotal; i++) {
                             getFieldData = mapFieldData.get(arrayListFieldEnableOnly.get(i));               // +2Field for skip ==> sumDataUplink,sumDataDownLink
                             keyValue = mapHexString2FieldName.get(arrayListFieldEnableOnly.get(i));
