@@ -185,13 +185,17 @@ class SubFieldDecoder {
         String lac_hex_str = "0x" + String.format("%02X", raw_loc_info[4]) + String.format("%02X", raw_loc_info[5]);
         String ci_hex_str = "0x" + String.format("%02X", raw_loc_info[6]) + String.format("%02X", raw_loc_info[7]);
 
+        String lacHex = String.format("%02X", raw_loc_info[4]) + String.format("%02X", raw_loc_info[5]);    // use for display LAC+SAC in Hex format
+        String ciHex = String.format("%02X", raw_loc_info[6]) + String.format("%02X", raw_loc_info[7]);     // use for display LAC+SAC in Hex format
+
         if (raw_loc_info.length == 8) {
             if (raw_loc_info[0] == 0) {        // 0=CGI =>(PLMN+LAC+CI) ; 1=SAI =>(PLMN+LAC+SAC)
-                decode_user_loc_info = "PLMN:" + DataConverter.tBCD2String(plmn_raw) + " LAC:" + Integer.toString(DataConverter.hexString2int(lac_hex_str))
+
+                decode_user_loc_info = "PLMN:" + DataConverter.tBCD2String(plmn_raw) + " LAC:" + Integer.toString(DataConverter.hexString2int(lac_hex_str)) // Original Include TagName
                         + " CI:" + Integer.toString(DataConverter.hexString2int(ci_hex_str));
             } else {
-                decode_user_loc_info = "PLMN:" + DataConverter.tBCD2String(plmn_raw) + " LAC:" + Integer.toString(DataConverter.hexString2int(lac_hex_str))
-                        + " SAC:" + Integer.toString(DataConverter.hexString2int(ci_hex_str));
+                decode_user_loc_info = "PLMN:" + DataConverter.tBCD2String(plmn_raw) + " LAC:" + Integer.toString(DataConverter.hexString2int(lac_hex_str)) // Original Include TagName
+                        + " SAC:" + Integer.toString(DataConverter.hexString2int(ci_hex_str));                                                                // Original Include TagName
             }
         } else {
             if (raw_loc_info.length == 0x0D) {
@@ -208,6 +212,9 @@ class SubFieldDecoder {
                 decode_user_loc_info = "Unknow TAG:" + DataConverter.Int2HexString(raw_loc_info);
             }
         }
+
+        decode_user_loc_info = lacHex + ciHex;  // Edit 20160715 09:12 remove TagName by override data from location decoder
+
         return decode_user_loc_info;
     }
 }
